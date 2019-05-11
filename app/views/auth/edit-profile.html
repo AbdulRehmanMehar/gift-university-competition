@@ -1,0 +1,52 @@
+{% from "_formsHelper.html" import render_field %}
+{% extends "base.html" %}
+
+{% block title %} Update Profile {% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">Edit Profile</div>
+            <div class="card-body">
+                <form action="{{ url_for('auth.edit_profile') }}" method="POST">
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.email, value=current_user.email) }}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.username, value=current_user.username) }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.name, value=current_user.name) }}
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.phone, value=current_user.phone) }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ render_field(form.address, html_=current_user.address) }}
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.password) }}
+                            <span class="form-text text-muted">
+                                Leave empty if you don't wanna change.
+                            </span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            {{ render_field(form.cpassword) }}
+                        </div>
+                    </div>
+
+                    <a href="#" style="float:right" onclick="
+                        if(confirm('Do you wanna leave this page?')) window.location.href = `{{ url_for('auth.upload_photo') }}`
+                    ">Change Photo</a>
+                    <button type="submit" class="mt-2 btn btn-outline-info form-control">Update</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
