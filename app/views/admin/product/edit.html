@@ -1,0 +1,54 @@
+{% from "_formsHelper.html" import render_field %}
+
+{% extends "base.html" %}
+
+{% block title %}
+   Update Product - Admin Area
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.home') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.product') }}">Product</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Update</li>
+                </ol>
+            </nav>
+
+            <div class="card mt-4">
+                <div class="card-header">Update Product</div>
+                <div class="card-body">
+                    <form action="{{ url_for('admin.update_product', id=p_id) }}" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            {{ render_field(form.title) }}
+                        </div>
+                        <div class="form-group">
+                            {{ render_field(form.price) }}
+                        </div>
+                        <div class="form-group">
+                            {{ render_field(form.description) }}
+                        </div>
+                        <div class="form-group">
+                            {{ render_field(form.category) }}
+                        </div>
+                        <div class="form-group">
+                            {{ render_field(photo_form.photo, required=False, value='') }}
+                            <span class="form-text text-muted">
+                                Leave as it is if not to update.
+                            </span>
+                        </div>
+                        <button type="submit" class="form-control btn btn-info">Update Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
