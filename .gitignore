@@ -1,0 +1,8 @@
+**/venv
+**/__pycache__
+**/node_modules
+**/app.config
+**/__init__.pyc
+**/uploads/images/**
+**/uploads/videos/**
+! **/uploads/images/default.jpg
