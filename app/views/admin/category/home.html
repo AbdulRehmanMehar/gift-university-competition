@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Manage Categories - Admin Area
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.home') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Categories</li>
+                </ol>
+            </nav>
+
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">View Categories</h5>
+                    <p class="card-text">View all categories.</p>
+                    <a href="{{ url_for('admin.view_categories') }}" class="btn btn-info" style="float: right;">Go</a>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Add Category</h5>
+                    <p class="card-text">Add category for your products.</p>
+                    <a href="{{ url_for('admin.add_category') }}" class="btn btn-info" style="float: right;">Go</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
