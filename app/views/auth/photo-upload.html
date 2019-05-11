@@ -1,0 +1,30 @@
+{% from "_formsHelper.html" import render_field %}
+
+{% extends "base.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+{% block body %}
+
+<div class="container mt-4">
+    <div class="bg-image hw-4 mb-2" id="bg-image"></div>
+    <form action="{{ url_for('auth.upload_photo') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            {{ render_field(form.photo) }}
+            {% if current_user.photo != None %}
+                <div class="form-text invalid-feedback d-block">
+                    <a href="{{ url_for('auth.remove_photo') }}" style="float: right">Remove this photo?</a>
+                </div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-outline-info form-control">Upload</button>
+    </form>
+</div>
+
+<script>
+    let url = "{{ url_for('auth.get_photo', uname=current_user.username) }}";
+    let el = document.getElementById('bg-image');
+    el.style.backgroundImage = `url(${url})`;
+</script>
+
+{% endblock %}
