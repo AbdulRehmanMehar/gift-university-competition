@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}
+    View Categories - Admin Area
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.home') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.category') }}">Categories</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">View</li>
+                </ol>
+            </nav>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <div class="table-responsive pt-2">
+                        {% if categories %}
+                            <table class="table">
+                            <thead>
+                                <tr>
+                                    <th colspan="6" style="border-top: 0px;">View Categories</th>
+                                </tr>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Parent</th>
+                                    <th colspan="3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set i = namespace(count=1) %}
+                                {% if current_page_number > 1 %}
+                                    {% set i.count = current_page_number + items_per_page - 1 %}
+                                {% endif %}
+                                {% for category in categories %}
+                                    <tr>
+                                        <td>{{ i.count }}</td>
+                                        <td>{{ category.name }}</td>
+                                        <td>{{ category.parent }}</td>
+                                        <td>
+                                            <a href="{{ url_for('app.category', slug=category.slug) }}" target="_blank" class="text-dark">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('admin.update_category', id=category.id) }}" class="text-dark">
+                                                <i class="fas fa-pencil-alt"></i> Edit
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('admin.delete_category', id=category.id) }}" class="text-dark">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% set i.count = i.count + 1 %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                            <h3>No Category Was Found!</h3>
+                            <a href="{{ url_for('admin.add_category') }}">Add One?</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <nav class="mt-4 float-right">
+                {% set pageCount = namespace(count=1, className='') %}
+                <ul class="pagination">
+                    {% if current_page_number == 1 %}
+                        {% set pageCount.className='disabled' %}
+                    {% endif %}
+                    <li class="page-item {{ pageCount.className }}">
+                        <a class="page-link" href="{{ url_for('admin.view_categories', page=(current_page_number - 1)) }}">
+                            Previous
+                        </a>
+                    </li>
+
+                    {% for page in range(pages) %}
+                        {% set pageCount.count = page + 1 %}
+                        {% if current_page_number == pageCount.count %}
+                            {% set pageCount.className='active' %}
+                        {% else %}
+                            {% set pageCount.className='' %}
+                        {% endif %}
+                        <li class="page-item {{ pageCount.className }}">
+                            <a class="page-link" href="{{ url_for('admin.view_categories', page=pageCount.count) }}">{{ pageCount.count }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if current_page_number == pages %}
+                        {% set pageCount.className='disabled' %}
+                    {% endif %}
+                    <li class="page-item {{ pageCount.className }}">
+                        <a class="page-link" href="{{ url_for('admin.view_categories', page=(current_page_number + 1)) }}">
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+
+{% endblock %}
