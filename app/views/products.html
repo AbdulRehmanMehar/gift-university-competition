@@ -3,9 +3,76 @@
 {% block title %} Products @{{ category.name }} {% endblock %}
 
 {% block body %}
-    <h1>Products in {{ category.name }}</h1>
-    {% for product in products %}
-        <h2>{{ product.title }}</h2>
-    {% endfor %}
+    <h3 class="text-center my-4">Products in {{ category.name }}</h3>
+    <div class="row my-4 mx-auto">
+        {% set resp = namespace(col_size=4, offset=0, count=1) %}
+        {% if products|length == 1 %}
+            {% set resp.offset = 4 %}
+            {% set resp.col_size = 4 %}
+        {% elif products|length == 2 %}
+            {% set resp.offset = 2 %}
+            {% set resp.col_size = 4 %}
+        {% endif %}
+        {% if current_page_number > 1 %}
+            {% set resp.count = current_page_number + items_per_page - 1 %}
+        {% endif %}
+        <div class="offset-md-{{ resp.offset }}"></div>
+        {% for product in products %}
+            <div class="col-md-{{ resp.col_size }}">
+                <div class="card d-shadow my-4">
+                    <div class="bg-image" style="height: 200px; width: 100%; background-image: url({{ url_for('app.product_photo', slug=product.slug) }})"></div>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{ url_for('app.product', slug=product.slug) }}" class="text-dark" id="p-{{ resp.count }}">
+                                {{ product.title }}
+                            </a>
+                        </h5>
+                        <p>
+                            Price: {{ product.price }} Pkr
+                        </p>
+                        <a href="{{ url_for('app.product', slug=product.slug) }}" class="form-control btn btn-outline-dark">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% set resp.count = resp.count + 1 %}
+        {% endfor %}
+    </div>
+    <div style="position: relative">
+        <nav style="margin: 0 auto;">
+        {% set pageCount = namespace(count=1, className='') %}
+        <ul class="pagination">
+            {% if current_page_number == 1 %}
+                {% set pageCount.className='disabled' %}
+            {% endif %}
+            <li class="page-item {{ pageCount.className }}">
+                <a class="page-link" href="{{ url_for('app.category', slug=category.slug, page=(current_page_number - 1)) }}">
+                    Previous
+                </a>
+            </li>
 
+            {% for page in range(pages) %}
+                {% set pageCount.count = page + 1 %}
+                {% if current_page_number == pageCount.count %}
+                    {% set pageCount.className='active' %}
+                {% else %}
+                    {% set pageCount.className='' %}
+                {% endif %}
+                <li class="page-item {{ pageCount.className }}">
+                    <a class="page-link" href="{{ url_for('app.category', slug=category.slug, page=pageCount.count) }}">{{ pageCount.count }}</a>
+                </li>
+            {% endfor %}
+
+            {% if current_page_number == pages %}
+                {% set pageCount.className='disabled' %}
+            {% endif %}
+            <li class="page-item {{ pageCount.className }}">
+                <a class="page-link" href="{{ url_for('app.category', slug=category.slug, page=(current_page_number + 1)) }}">
+                    Next
+                </a>
+            </li>
+        </ul>
+    </nav>
+    </div>
 {% endblock %}
