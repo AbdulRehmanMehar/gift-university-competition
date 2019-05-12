@@ -27,11 +27,11 @@ class Pagination:
 
     def get_results(self):
 
-        if self.list:
+        try:
             st_idx = (self.current_page_number - 1) * self.items_per_page
             end_idx = self.current_page_number * self.items_per_page
             return self.list[st_idx: end_idx]
-        else:
+        except AttributeError:
             if self.current_page_number == 1:
                 return self.model.query\
                         .limit(self.items_per_page)\
