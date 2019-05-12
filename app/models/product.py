@@ -21,8 +21,8 @@ class Product(db.Model):
         self.description = description
         self.slug = self.set_slug(title)
 
-    def set_slug(self, title):
-        return title.strip().replace(' ', '')
+    def set_slug(self, slug):
+        return slug.lower().strip().replace(' ', '-')
     
     def __repr__(self):
         return self.title
