@@ -1,9 +1,11 @@
+import os
 from .. import app
-from ..models import Category
-from flask import Blueprint, render_template
+from ..models import Category, Product
+from flask import Blueprint, render_template, send_file
 from ..utils import Pagination
 
 index = Blueprint('app', __name__)
+
 
 @app.context_processor
 def inject():
@@ -14,7 +16,7 @@ def inject():
 @index.route('/')
 def home():
     return render_template('index.html')
-    
+
 
 @index.route('/cart')
 def cart():
@@ -25,7 +27,7 @@ def cart():
 @index.route('/category/<string:slug>/<int:page>')
 def category(slug, page):
     cat = Category.query.filter(Category.slug == slug).first()
-    paginator = Pagination(cat.products, 10, page)
+    paginator = Pagination(cat.products, 9, page)
     return render_template('products.html',
                            category=cat,
                            pages=paginator.pages,
@@ -33,6 +35,18 @@ def category(slug, page):
                            items_per_page=paginator.get_items_per_page(),
                            current_page_number=paginator.get_current_page_number()
                            )
+
+
+@index.route('/product/<string:slug>')
+def product(slug):
+    return f'Hello {slug}'
+
+
+@index.route('/product-image/<string:slug>')
+def product_photo(slug):
+    prod = Product.query.filter(Product.slug == slug).first()
+    file = os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', prod.photo)
+    return send_file(file)
 
 
 # IMPORT other controllers
