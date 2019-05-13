@@ -39,7 +39,8 @@ def category(slug, page):
 
 @index.route('/product/<string:slug>')
 def product(slug):
-    return f'Hello {slug}'
+    prod = Product.query.filter(Product.slug == slug).first()
+    return render_template('product.html', product=prod)
 
 
 @index.route('/product-image/<string:slug>')
