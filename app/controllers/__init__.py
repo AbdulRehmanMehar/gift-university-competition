@@ -1,7 +1,7 @@
 import os
 from .. import app
 from ..models import Category, Product
-from flask import Blueprint, render_template, send_file
+from flask import Blueprint, render_template, send_file, request
 from ..utils import Pagination
 
 index = Blueprint('app', __name__)
@@ -21,6 +21,11 @@ def home():
 @index.route('/cart')
 def cart():
     return render_template('cart.html')
+
+
+@index.route('/add-to-cart/<string:slug>', methods=['POST'])
+def add_to_cart(slug):
+    return f'{slug}, {request.form["quantity"]} The Product Id'
 
 
 @index.route('/category/<string:slug>', defaults={'page': 1})
