@@ -54,8 +54,59 @@ html, body {
     position: absolute;
 }
 
+.p-fixed{
+    position: fixed;
+}
+
 .p-down{
     bottom: 0;
+}
+
+.p-right{
+    right: 0;
+}
+
+.add-to-cart{
+    margin: 10px 20px;
+    overflow: none;
+}
+
+.add-to-cart .button {
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.add-to-cart .button i{
+    font-size: 24px;
+    position: absolute;
+    top: 27%;
+    left: 20%;
+}
+
+.cart-form{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: calc(-400% - 27px);
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+
+.cart-form.active{
+    display: inline-block;
+}
+
+.cart-form .center-align{
+    margin-top: 10px;
+    margin-bottom: -7px;
+    padding-left: 20px;
+    padding-right: 7px;
 }
 
 .breadcrumb{
