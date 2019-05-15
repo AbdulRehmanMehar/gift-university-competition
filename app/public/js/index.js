@@ -11,4 +11,25 @@ $(document).ready(() => {
         }
     });
 
+    $('#showCartButton').click(() => {
+        $('#cart-form').toggleClass('active');
+    });
+
+    $('#cart-form').submit((event) => {
+        event.preventDefault();
+        let qtty = $('#cart-form #cart-qtty').val();
+        let pslug = $('#cart-form #product-slug').val();
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/add-to-cart/' + pslug,
+            data: {
+                quantity: qtty
+            },
+            success: (data) => console.log(data),
+            error: (msg) => console.error(msg)
+        })
+        console.log(qtty, pslug);
+    });
+
+
 });
