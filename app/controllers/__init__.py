@@ -10,7 +10,7 @@ index = Blueprint('app', __name__)
 @app.context_processor
 def inject():
     cat = Category.query.all()
-    return dict(categories=cat)
+    return dict(categories=cat, cart=[])
 
 
 @index.route('/')
