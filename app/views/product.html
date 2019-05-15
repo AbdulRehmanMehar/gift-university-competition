@@ -22,7 +22,27 @@
                 <h4>Description</h4>
                 <p>{{ product.description }}</p>
             </div>
-
+            <div class="add-to-cart p-fixed p-down p-right" title="Add to Cart">
+                <form action="#" class="cart-form bg-dark" id="cart-form">
+                    <div class="center-align">
+                        <div class="form-row">
+                            <div class="col-8 form-group">
+                                <input type="number" class="form-control form-control-sm" id="cart-qtty" value="1" min="1">
+                                <input type="hidden" id="product-slug" value="{{ product.slug }}">
+                            </div>
+                            <div class="col-3 form-group">
+                                <button class="btn btn-sm btn-outline-light">
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="button bg-dark text-light" id="showCartButton">
+                    <i class="fas fa-cart-plus"></i>
+                </div>
+           </div>
         </div>
+
     </div>
 {% endblock %}
