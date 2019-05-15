@@ -19,17 +19,33 @@ $(document).ready(() => {
         event.preventDefault();
         let qtty = $('#cart-form #cart-qtty').val();
         let pslug = $('#cart-form #product-slug').val();
+        addToCart(qtty, pslug);
+    });
+
+    $('.add-to-cart-from').each((i, el) => {
+        $(el).submit((event) => {
+            event.preventDefault();
+            let key = $(el).attr('id').split('-').pop();
+            let qtty = $(`#p-qtty-${key}`).val();
+            let pslug = $(`#p-pslug-${key}`).val();
+            addToCart(qtty, pslug);
+        });
+    });
+
+    function addToCart(qtty, pslug) {
+        let cartItems = $('#cart_items');
         $.ajax({
             type: 'POST',
             url: 'http://localhost:5000/add-to-cart/' + pslug,
             data: {
                 quantity: qtty
             },
-            success: (data) => console.log(data),
+            success: (data) => {
+                let n = parseInt($(cartItems).html()) + parseInt(qtty);
+                $(cartItems).html(n);
+            },
             error: (msg) => console.error(msg)
-        })
-        console.log(qtty, pslug);
-    });
-
+        });
+    }
 
 });
