@@ -1,7 +1,7 @@
 import os
 from .. import app
 from ..models import Category, Product
-from flask import Blueprint, render_template, send_file, request
+from flask import Blueprint, render_template, send_file, request, session, abort
 from ..utils import Pagination
 
 index = Blueprint('app', __name__)
@@ -10,7 +10,8 @@ index = Blueprint('app', __name__)
 @app.context_processor
 def inject():
     cat = Category.query.all()
-    return dict(categories=cat, cart=[])
+    # session['cart'] = {}
+    return dict(categories=cat, cart=session['cart'])
 
 
 @index.route('/')
@@ -25,7 +26,40 @@ def cart():
 
 @index.route('/add-to-cart/<string:slug>', methods=['POST'])
 def add_to_cart(slug):
-    return f'{slug}, {request.form["quantity"]} The Product Id'
+    prod = Product.query.filter(Product.slug == slug).first()
+    if prod:
+        d = {
+            'pid': prod.id,
+            'title': prod.title,
+            'price': prod.price,
+            'slug': prod.slug,
+            'quantity': int(request.form['quantity'])
+        }
+        try:
+            old = session['cart'][f'p-{prod.id}']
+            if old:
+                session['cart']['len'] = session['cart']['len'] + d['quantity']
+                session['cart'][f'p-{prod.id}']['quantity'] = old['quantity'] + d['quantity']
+                session['cart'] = session['cart']
+            else:
+                session['cart'] = {
+                    **session['cart'],
+                    f'p-{prod.id}': d,
+                    'len': session['cart'].get('len') + d.get('quantity')
+                }
+        except KeyError:
+            length = d.get('quantity')
+            try:
+                length += session['cart']['len']
+            except KeyError:
+                length = d.get('quantity')
+            session['cart'] = {
+                **session['cart'],
+                f'p-{prod.id}': d,
+                'len': length
+            }
+        return f'{slug}, {request.form["quantity"]} The Product Id'
+    return abort(500)
 
 
 @index.route('/category/<string:slug>', defaults={'page': 1})
