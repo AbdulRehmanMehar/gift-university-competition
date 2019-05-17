@@ -25,9 +25,8 @@ $(document).ready(() => {
     $('.add-to-cart-from').each((i, el) => {
         $(el).submit((event) => {
             event.preventDefault();
-            let key = $(el).attr('id').split('-').pop();
-            let qtty = $(`#p-qtty-${key}`).val();
-            let pslug = $(`#p-pslug-${key}`).val();
+            let qtty = $(event.target).find($('input[type=number]')).val();
+            let pslug = $(event.target).find($('input[type=hidden]')).val();
             addToCart(qtty, pslug);
         });
     });
