@@ -59,7 +59,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('app.cart') }}">
                             <i class="fas fa-shopping-cart"></i> Cart
-                            <span class="badge bg-light" id="cart_items">{{ cart|length }}</span>
+                            <span class="badge bg-light" id="cart_items">{{ cart.len }}</span>
                         </a>
                     </li>
                     {% if current_user.is_authenticated %}
