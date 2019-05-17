@@ -3,5 +3,62 @@
 {% block title %} Cart {% endblock %}
 
 {% block body %}
-    <h1>Welcome to cart</h1>
+    <div class="card">
+        <div class="card-header">Cart</div>
+        <div class="card-body">
+            {% if cart %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Title</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set count = namespace(i=1) %}
+                            {% for key, product in cart.items() %}
+                                {% if key != 'len' %}
+                                    <tr>
+                                        <td>{{ count.i }}</td>
+                                        <td>{{ product.title }}</td>
+                                        <td>{{ product.price }}</td>
+                                        <td>{{ product.quantity }}</td>
+                                        <td>{{ product.price * product.quantity }}</td>
+                                        <td>
+                                            <form action="#" id="cart-update-form">
+                                                <div class="center-align">
+                                                    <input type="number" class="form-control form-control-sm" id="cart-qtty" value="{{ product.quantity }}" min="1" style="width: 50px; display: inline-block">
+                                                    <input type="hidden" id="product-slug" value="{{ product.id }}">
+
+                                                    <button class="btn btn-sm btn-outline-dark" style="display: inline-block">
+                                                        Update
+                                                    </button>
+                                                    &nbsp;&nbsp;
+                                                    <a href="#" class="text-dark" style="display: inline-block;">
+                                                        <i class="fas fa-trash" style="font-size: 20px;"></i>
+                                                    </a>
+                                                </div>
+                                            </form>
+
+
+                                        </td>
+                                    </tr>
+                                    {% set count.i = count.i + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <h3>Your cart is empty!</h3>
+{#                <a href="{{ url_for('app.') }}">Add One?</a>#}
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
