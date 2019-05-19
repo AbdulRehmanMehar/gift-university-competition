@@ -23,24 +23,33 @@
                             {% set count = namespace(i=1) %}
                             {% for key, product in cart.items() %}
                                 {% if key != 'len' %}
-                                    <tr>
+                                    <tr id="tr-{{ product.slug }}">
                                         <td>{{ count.i }}</td>
-                                        <td>{{ product.title }}</td>
-                                        <td>{{ product.price }}</td>
-                                        <td>{{ product.quantity }}</td>
-                                        <td>{{ product.price * product.quantity }}</td>
                                         <td>
-                                            <form action="#" id="cart-update-form">
+                                            <a href="{{ url_for('app.product', slug=product.slug) }}" class="text-dark" target="_blank">
+                                                {{ product.title }}
+                                            </a>
+                                        </td>
+                                        <td id="{{ product.slug }}-price">{{ product.price }}</td>
+                                        <td id="{{ product.slug }}-qtty">{{ product.quantity }}</td>
+                                        <td id="{{ product.slug }}-total">{{ product.price * product.quantity }}</td>
+                                        <td>
+                                            <form action="#" class="cart-update-form">
                                                 <div class="center-align">
-                                                    <input type="number" class="form-control form-control-sm" id="cart-qtty" value="{{ product.quantity }}" min="1" style="width: 50px; display: inline-block">
-                                                    <input type="hidden" id="product-slug" value="{{ product.id }}">
+                                                    <input type="number" class="form-control form-control-sm cart-qtty" value="{{ product.quantity }}" min="1" style="width: 50px; display: inline-block">
+                                                    <input type="hidden" class="product-slug" value="{{ product.slug }}">
 
                                                     <button class="btn btn-sm btn-outline-dark" style="display: inline-block">
                                                         Update
                                                     </button>
                                                     &nbsp;&nbsp;
-                                                    <a href="#" class="text-dark" style="display: inline-block;">
-                                                        <i class="fas fa-trash" style="font-size: 20px;"></i>
+                                                    <a href="#" class="delete-cart-item" style="display: inline-block;">
+                                                        
+                                                        <!-- <button class="btn" type="submit"> -->
+                                                            <i class="fas fa-trash text-dark" style="font-size: 20px;">
+                                                                <span class="sr-only">{{product.slug}}</span>
+                                                            </i>
+                                                        <!-- </button> -->
                                                     </a>
                                                 </div>
                                             </form>
