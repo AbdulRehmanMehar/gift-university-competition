@@ -6,7 +6,7 @@
     <div class="card">
         <div class="card-header">Cart</div>
         <div class="card-body">
-            {% if cart %}
+            {% if cart.len > 0 %}
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
@@ -20,7 +20,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% set count = namespace(i=1) %}
+                            {% set count = namespace(i=1, total=0) %}
                             {% for key, product in cart.items() %}
                                 {% if key != 'len' %}
                                     <tr id="tr-{{ product.slug }}">
@@ -39,17 +39,14 @@
                                                     <input type="number" class="form-control form-control-sm cart-qtty" value="{{ product.quantity }}" min="1" style="width: 50px; display: inline-block">
                                                     <input type="hidden" class="product-slug" value="{{ product.slug }}">
 
-                                                    <button class="btn btn-sm btn-outline-dark" style="display: inline-block">
+                                                    <button class="btn btn-sm btn-dark" style="display: inline-block">
                                                         Update
                                                     </button>
                                                     &nbsp;&nbsp;
-                                                    <a href="#" class="delete-cart-item" style="display: inline-block;">
-                                                        
-                                                        <!-- <button class="btn" type="submit"> -->
-                                                            <i class="fas fa-trash text-dark" style="font-size: 20px;">
-                                                                <span class="sr-only">{{product.slug}}</span>
-                                                            </i>
-                                                        <!-- </button> -->
+                                                    <a href="#" class="delete-cart-item" style="display: inline-block;">                                                        
+                                                        <i class="fas fa-trash text-dark" style="font-size: 20px;">
+                                                            <span class="sr-only">{{product.slug}}</span>
+                                                        </i>
                                                     </a>
                                                 </div>
                                             </form>
@@ -57,10 +54,23 @@
 
                                         </td>
                                     </tr>
+                                    {% set count.total = count.total + (product.price * product.quantity) %}
                                     {% set count.i = count.i + 1 %}
                                 {% endif %}
                             {% endfor %}
-                            
+                            <tr>
+                                <td colspan="5" style="text-align: right"></td>
+                                <td><b>Grand Total</b>: <span id="g-total">{{ count.total }}</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="text-align: right">
+                                    
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('app.save_cart') }}" class="btn btn-primary btn-sm">Save for later</a>
+                                    <a href="#" class="btn btn-success btn-sm">Checkout</a>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
