@@ -1,0 +1,22 @@
+{
+    "python.pythonPath": "venv\\Scripts\\python.exe",
+    "search.exclude": {
+        ".vscode": true
+    },
+    "files.watcherExclude": {
+        ".vscode": true,
+        "**/__pycache__": true,
+        "venv": true
+    },
+    "files.exclude": {
+        ".vscode": true,
+        "**/__pycache__": true,
+        "venv": true
+    },
+    "python.linting.pylintArgs": [
+        "--errors-only",
+        "--load-plugins",
+        "pylint_flask"
+    ],
+    "python.linting.pylintEnabled": true
+}
