@@ -45,7 +45,6 @@ $(document).ready(() => {
         $(el).click((event) => {
             event.preventDefault();
             let pslug = $(event.target).find($('.sr-only')).html();
-            $(`#tr-${pslug}`).remove();
             deleteFromCart(pslug);
         });
     });
@@ -72,11 +71,14 @@ $(document).ready(() => {
                 quantity: qtty
             },
             success: () => {
-                updateCartLength();
+                let old_qtty = parseInt($(`#${pslug}-qtty`).html());
                 let price = parseInt($(`#${pslug}-price`).html());
+                let gtotal = parseInt($('#g-total').html());
                 let total = price * qtty;
                 $(`#${pslug}-qtty`).html(qtty);
                 $(`#${pslug}-total`).html(total);
+                $('#g-total').html((gtotal - (price * old_qtty)) + total);
+                updateCartLength();
             },
             error: (msg) => console.error(msg)
         })
@@ -86,7 +88,14 @@ $(document).ready(() => {
         $.ajax({
             type: 'POST', 
             url: `${app_uri}/remove-from-cart/${pslug}`,
-            success: () => updateCartLength(),
+            success: () => {
+                let old_qtty = parseInt($(`#${pslug}-qtty`).html());
+                let price = parseInt($(`#${pslug}-price`).html());
+                let gtotal = parseInt($('#g-total').html());
+                $('#g-total').html(gtotal - (price * old_qtty));
+                $(`#tr-${pslug}`).remove();
+                updateCartLength();
+            },
             error: (msg) => console.error(msg)
         })
     }
