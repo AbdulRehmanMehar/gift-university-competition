@@ -16,6 +16,22 @@ $(document).ready(() => {
         $('#cart-form').toggleClass('active');
     });
 
+    $('#save-cart').click((event) => {
+        event.preventDefault();
+        let title = prompt("Enter title for the cart: ");
+        if (title) {
+            $.ajax({
+                type: 'POST',
+                url: `${app_uri}/save-cart`,
+                data: {
+                    title: title
+                },
+                success: () => window.location.reload(),
+                error: (error) => console.error(error)
+            })
+        }
+    });
+
     $('#cart-form').submit((event) => {
         event.preventDefault();
         let qtty = $('#cart-form #cart-qtty').val();
@@ -46,6 +62,22 @@ $(document).ready(() => {
             event.preventDefault();
             let pslug = $(event.target).find($('.sr-only')).html();
             deleteFromCart(pslug);
+        });
+    });
+
+    $('.delete-db-cart').each((i, el) => {
+        $(el).click(event => {
+            event.preventDefault();
+            let id = $(event.target).attr('cart-id');
+            $.ajax({
+                type: 'POST',
+                url: `${app_uri}/delete-db-cart`,
+                data: {
+                    id: id
+                },
+                success: () => window.location.reload(),
+                error: (error) => console.error(error)
+            })
         });
     });
 
