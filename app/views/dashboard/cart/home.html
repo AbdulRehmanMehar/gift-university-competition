@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %} Cart {% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('dashboard.home') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Cart</li>
+                </ol>
+            </nav>
+            {% if current_user.cart %}
+                {% for cart in current_user.cart %}
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ cart.title }}</h5>
+                            <div  style="float: right;">
+                                <a href="{{ url_for('dashboard.view_cart', id=cart.id) }}" class="btn btn-info">View</a>
+                                <a href="#" class="delete-db-cart btn btn-danger" cart-id="{{cart.id}}">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Nothing was found!</h5>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
