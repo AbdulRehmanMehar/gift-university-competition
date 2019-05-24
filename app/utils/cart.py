@@ -76,6 +76,12 @@ class Cart:
             return True
         return False
 
+    def getCartFromDatabase(self):
+        if self.cart_id:
+            dbc = CartModel.query.filter(CartModel.id == self.cart_id).first()
+            return dbc
+        return {'len': 0}
+
     def deleteCartFromDatabase(self):
         if self.cart_id:
             dbc = CartModel.query.filter(CartModel.id == self.cart_id).first()
