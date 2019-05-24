@@ -1,7 +1,7 @@
 import os
 from .. import app
 from ..models import Category, Product
-from flask import Blueprint, render_template, send_file, request, session, abort
+from flask import Blueprint, render_template, send_file, request, session, abort, flash
 from ..utils import Pagination, Cart
 
 index = Blueprint('app', __name__)
@@ -52,11 +52,24 @@ def remove_cart(slug):
     return abort(500)
 
 
-@index.route('/save-cart', methods=['GET'])
+@index.route('/save-cart', methods=['POST'])
 def save_cart():
-    crt = Cart(None, None)
+    title = request.form['title']
+    crt = Cart(None, None, title)
     if crt.saveToDatabase():
+        flash('Cart was saved to database successfully.', 'success')
         return 'Very Good'
+    return abort(500)
+
+
+
+@index.route('/delete-db-cart', methods=['POST'])
+def delete_db_cart():
+    id = int(request.form['id'])
+    crt = Cart(None, None, None, id)
+    if crt.deleteCartFromDatabase():
+        flash('Cart was removed from database successfully.', 'info')
+        return 'Done'
     return abort(500)
 
 
