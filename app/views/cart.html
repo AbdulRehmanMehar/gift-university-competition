@@ -7,7 +7,7 @@
         <div class="card-header">Cart</div>
         <div class="card-body">
             {% if cart.len > 0 %}
-                <div class="table-responsive">
+                <div class="table-responsive" id="the-table">
                     <table class="table">
                         <thead>
                             <tr>
@@ -67,8 +67,13 @@
                                     
                                 </td>
                                 <td>
-                                    <a href="{{ url_for('app.save_cart') }}" class="btn btn-primary btn-sm">Save for later</a>
-                                    <a href="#" class="btn btn-success btn-sm">Checkout</a>
+                                    {% if current_user.is_authenticated %}
+                                        <a href="{{ url_for('app.save_cart') }}" id="save-cart" class="btn btn-primary btn-sm">Save for later</a>
+                                        <a href="#" class="btn btn-success btn-sm">Checkout</a>
+                                    {% else %}
+                                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">Login</a>
+                                        <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-sm">Register</a>
+                                    {% endif %}
                                 </td>
                             </tr>
                         </tbody>
