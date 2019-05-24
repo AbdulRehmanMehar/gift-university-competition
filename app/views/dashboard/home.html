@@ -4,37 +4,38 @@
 
 {% block body %}
 
-<div class="container-fluid mt-4">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    My Videos
-                </div>
-                <div class="card-body">
-                    <!-- {{ videos }} -->
-                    {% if videos|length >= 0 %}
-                        {% for video in videos %}
-                            {{ video.title }}
-                        {% endfor %}
-                    {% else %}
-                        <h1>No video to show.</h1>
-                    {% endif %}
-                </div>
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <nav aria-label="breadcrumb" class="mt-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">Home</li>
+            </ol>
+        </nav>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Saved Cart</h5>
+                <p class="card-text">View or Delete your saved cart.</p>
+                <a href="{{ url_for('dashboard.cart') }}" class="btn btn-info" style="float: right;">Go</a>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    My Subscribtions
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Special title treatment</h5>
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Track Orders</h5>
+                <p class="card-text">See whether your order is ready for departure.</p>
+                <a href="{{ url_for('admin.product') }}" class="btn btn-info" style="float: right;">Go</a>
             </div>
         </div>
+<!-- 
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title"></h5>
+                <p class="card-text">Add, View, Update or Delete orders made by customers.</p>
+                <a href="#" class="btn btn-info" style="float: right;">Go</a>
+            </div>
+        </div> -->
+
     </div>
 </div>
 
