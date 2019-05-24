@@ -1,6 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, request, abort, flash, Markup
-from flask_login import current_user
+import yaml
+from ..utils import Cart
 from ..models import User
+from flask_login import current_user
+from flask import Blueprint, render_template, redirect, url_for, request, abort, flash, Markup
+
 
 dashboard = Blueprint('dashboard', __name__)
 
@@ -21,6 +24,16 @@ def home():
     return render_template('dashboard/home.html')
 
 
-@dashboard.route('/checkout')
-def checkout():
-    return 'Welcome to checkout'
+@dashboard.route('/cart')
+def cart():
+    return render_template('dashboard/cart/home.html')
+
+
+@dashboard.route('/view-cart/<int:id>')
+def view_cart(id):
+    crt = Cart(None, None, None, int(id))
+    res = crt.getCartFromDatabase()
+    if res:
+        return render_template('dashboard/cart/viewable.html', crt=yaml.load(res.cart), ctitle=res.title, cid=res.id)
+    return redirect(url_for('dashboard.cart'))
+
