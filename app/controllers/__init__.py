@@ -1,8 +1,9 @@
-import os
+import os, stripe
 from .. import app
-from ..models import Category, Product
-from flask import Blueprint, render_template, send_file, request, session, abort, flash
 from ..utils import Pagination, Cart
+from ..models import Category, Product
+from flask_login import login_required, current_user
+from flask import Blueprint, render_template, send_file, request, session, abort, flash
 
 index = Blueprint('app', __name__)
 
@@ -22,6 +23,46 @@ def home():
 @index.route('/cart')
 def cart():
     return render_template('cart.html')
+
+
+@index.route('/checkout')
+@login_required
+def checkout():
+    amount = 0
+    for key, product in session.get('cart').items():
+        if key != 'len':
+            amount += product.get('price') * product.get('quantity')
+    return render_template('checkout.html', stripe_pk=app.config['STRIPE_PUBLISHABLE_KEY'], amount=amount)
+
+
+@index.route('/charge', methods=['POST'])
+@login_required
+def charge():
+    stripe.api_key = app.config['STRIPE_SECRET_KEY']
+    try:
+        amount = 0
+        for key, product in session.get('cart').items():
+            if key != 'len':
+                amount += product.get('price') * product.get('quantity')
+        amount *= 100 # Convert into cents
+
+        customer = stripe.Customer.create(
+            email = current_user.email,
+            source = request.form['stripeToken']
+        )
+
+        charge = stripe.Charge.create(
+            customer = customer.id,
+            amount = amount,
+            currency = 'usd',
+            description = 'ordered'
+        )
+
+        print(customer, charge)
+        return 'Success'
+
+    except stripe.errors.StripeError:
+        return abort(500)
 
 
 @index.route('/cart-len', methods=['POST'])
@@ -53,6 +94,7 @@ def remove_cart(slug):
 
 
 @index.route('/save-cart', methods=['POST'])
+@login_required
 def save_cart():
     title = request.form['title']
     crt = Cart(None, None, title)
@@ -64,6 +106,7 @@ def save_cart():
 
 
 @index.route('/delete-db-cart', methods=['POST'])
+@login_required
 def delete_db_cart():
     id = int(request.form['id'])
     crt = Cart(None, None, None, id)
