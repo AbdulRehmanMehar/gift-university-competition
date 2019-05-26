@@ -60,7 +60,7 @@
                             {% endfor %}
                             <tr>
                                 <td colspan="5" style="text-align: right"></td>
-                                <td><b>Grand Total</b>: <span id="g-total">{{ count.total }}</span></td>
+                                <td><b>Grand Total</b>: $<span id="g-total">{{ count.total }}</span></td>
                             </tr>
                             <tr>
                                 <td colspan="5" style="text-align: right">
@@ -69,7 +69,8 @@
                                 <td>
                                     {% if current_user.is_authenticated %}
                                         <a href="{{ url_for('app.save_cart') }}" id="save-cart" class="btn btn-primary btn-sm">Save for later</a>
-                                        <a href="#" class="btn btn-success btn-sm">Checkout</a>
+                                        <a href="{{ url_for('app.checkout') }}" class="btn btn-success btn-sm">Checkout</a>
+                                    
                                     {% else %}
                                         <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm">Login</a>
                                         <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-sm">Register</a>
