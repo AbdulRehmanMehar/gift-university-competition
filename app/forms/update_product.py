@@ -16,7 +16,7 @@ class UpdateProductForm(Form):
 
     price = IntegerField('Price', [
         validators.DataRequired(),
-    ], description='150 pkr')
+    ], description='150 usd')
 
     description = TextAreaField('Description', [
         validators.DataRequired(),
