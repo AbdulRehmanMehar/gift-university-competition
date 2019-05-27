@@ -1,6 +1,6 @@
 import yaml
 from ..utils import Cart
-from ..models import User
+from ..models import User, Order
 from flask_login import current_user
 from flask import Blueprint, render_template, redirect, url_for, request, abort, flash, Markup
 
@@ -37,3 +37,15 @@ def view_cart(id):
         return render_template('dashboard/cart/viewable.html', crt=yaml.load(res.cart), ctitle=res.title, cid=res.id)
     return redirect(url_for('dashboard.cart'))
 
+
+@dashboard.route('/orders')
+def order():
+    return render_template('dashboard/orders/home.html')
+
+
+@dashboard.route('/view-order/<int:id>')
+def view_order(id):
+    res = Order.query.filter(Order.id == int(id)).first()
+    if res:
+        return render_template('dashboard/cart/viewable.html', crt=yaml.load(res.cart), status=res.status, cid=res.id, amount=res.amount)
+    return redirect(url_for('dashboard.cart'))
