@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %} Track Orders {% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <nav aria-label="breadcrumb" class="mt-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item" aria-current="page">
+                    <a href="{{ url_for('dashboard.home') }}">Home</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Orders</li>
+            </ol>
+        </nav>
+        {% if current_user.order %}
+            {% for order in current_user.order %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ order.placed_on }} @ ${{ order.amount }}</h5>
+                    <div style="float: right;">
+                        <a href="{{ url_for('dashboard.view_order', id=order.id) }}" class="btn btn-info">View</a>
+                        <a href="#" class="delete-order btn btn-danger" order-id="{{order.id}}">Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
