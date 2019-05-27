@@ -1,9 +1,9 @@
 import os, stripe
 from .. import app
 from ..utils import Pagination, Cart
-from ..models import Category, Product
+from ..models import db, Category, Product, Order
 from flask_login import login_required, current_user
-from flask import Blueprint, render_template, send_file, request, session, abort, flash
+from flask import Blueprint, render_template, send_file, request, session, abort, flash, redirect, url_for
 
 index = Blueprint('app', __name__)
 
@@ -28,11 +28,14 @@ def cart():
 @index.route('/checkout')
 @login_required
 def checkout():
-    amount = 0
-    for key, product in session.get('cart').items():
-        if key != 'len':
-            amount += product.get('price') * product.get('quantity')
-    return render_template('checkout.html', stripe_pk=app.config['STRIPE_PUBLISHABLE_KEY'], amount=amount)
+    if session.get('cart').get('len') > 0:
+        amount = 0
+        for key, product in session.get('cart').items():
+            if key != 'len':
+                amount += product.get('price') * product.get('quantity')
+        return render_template('checkout.html', stripe_pk=app.config['STRIPE_PUBLISHABLE_KEY'], amount=amount)
+    flash('It seems that you\'re cart is empty.', 'danger')
+    return redirect(url_for('app.cart'))
 
 
 @index.route('/charge', methods=['POST'])
@@ -44,7 +47,6 @@ def charge():
         for key, product in session.get('cart').items():
             if key != 'len':
                 amount += product.get('price') * product.get('quantity')
-        amount *= 100 # Convert into cents
 
         customer = stripe.Customer.create(
             email = current_user.email,
@@ -53,16 +55,19 @@ def charge():
 
         charge = stripe.Charge.create(
             customer = customer.id,
-            amount = amount,
+            amount = amount * 100, # in cents
             currency = 'usd',
             description = 'ordered'
         )
-
-        print(customer, charge)
-        return 'Success'
-
-    except stripe.errors.StripeError:
-        return abort(500)
+        ordr = Order('Placed', amount, f'{session.get("cart")}', current_user.id)
+        db.session.add(ordr)
+        db.session.commit()
+        crt = Cart(None, None)
+        crt.deleteTheCart()
+        return redirect(url_for('dashboard.order'))
+    except:
+        flash('Something went seriously wrong.', 'danger')
+        return redirect(url_for('app.cart'))
 
 
 @index.route('/cart-len', methods=['POST'])
