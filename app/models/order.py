@@ -9,16 +9,20 @@ class Order(db.Model):
     status = db.Column(db.String, nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     cart = db.Column(db.String(5000), nullable=False)
+    charge_id = db.Column(db.String, nullable=False)
+    customer_id = db.Column(db.String, nullable=False)
     owner_id = db.Column(db.ForeignKey('users.id'),
                          unique=False, nullable=False)
     owner = db.relationship('User', backref=db.backref('order', uselist=True))
     placed_on = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __init__(self, status, amount, cart, owner_id):
+    def __init__(self, status, amount, cart, owner_id, charge_id, customer_id):
         self.cart = cart
         self.status = status
         self.amount = amount
         self.owner_id = owner_id
+        self.charge_id = charge_id
+        self.customer_id = customer_id
 
     def __repr__(self):
         return f'{self.owner.name}'
