@@ -14,13 +14,19 @@
             </ol>
         </nav>
         {% if current_user.order %}
-            {% for order in current_user.order %}
-            <div class="card">
+            {% for order in current_user.order|reverse %}
+            <div class="card my-4">
                 <div class="card-body">
                     <h5 class="card-title">{{ order.placed_on }} @ ${{ order.amount }}</h5>
+                    <p><b>Status</b>: {{ order.status }}</p>
                     <div style="float: right;">
-                        <a href="{{ url_for('dashboard.view_order', id=order.id) }}" class="btn btn-info">View</a>
-                        <a href="#" class="delete-order btn btn-danger" order-id="{{order.id}}">Delete</a>
+                        <a href="{{ url_for('dashboard.view_order', id=order.id) }}" class="btn btn-primary btn-sm">View</a>
+                        {% if order.status != 'Canceled' and order.status != 'Completed' %}
+                            <form class="d-inline" action="{{ url_for('app.cancel_order') }}" method="POST">
+                                <input type="hidden" name="id" value="{{ order.id }}">
+                                <button class="cancel-order btn btn-danger btn-sm" type="submit">Cancel</button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
