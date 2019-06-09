@@ -43,6 +43,55 @@
                 </div>
            </div>
         </div>
-
     </div>
+
+
+{% if product.category.products|length > 0 %}
+    <div class="clearfix"></div>
+    <hr />
+    <h3 class="text-center">More from {{product.category.name}}</h3>
+    <div class="row my-4 mx-auto">
+        {% set resp = namespace(col_size=4, offset=0, count=1) %}
+        {% for product1 in product.category.products %}
+        {% if resp.count <= 3 %}
+        {% if product1.id != product.id %}
+            <div class="col-md-4">
+                <div class="card d-shadow my-4">
+                    <div class="bg-image"
+                        style="height: 200px; width: 100%; background-image: url({{ url_for('app.product_photo', slug=product1.slug) }})">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{{ url_for('app.product', slug=product1.slug) }}" class="text-dark" id="p-{{ resp.count }}">
+                                {{ product1.title }}
+                            </a>
+                        </h5>
+                        <p>
+                            Price: {{ product1.price }} usd
+                        </p>
+                        <form action="#" class="add-to-cart-from" id="form-{{ product1.id }}">
+                            <div class="form-row">
+                                <div class="form-group col-9">
+                                    <input type="number" class="form-control" id="p-qtty-{{ product1.id }}" value="1" min="1">
+                                    <input type="hidden" id="p-slug-{{ product1.id }}" value="{{ product1.slug }}">
+                                </div>
+                                <div class="form-group col-3">
+                                    <button type="submit" class="btn btn-outline-dark form-control">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <a href="{{ url_for('app.product', slug=product1.slug) }}" class="form-control btn btn-outline-dark">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% set resp.count = resp.count + 1 %}
+        {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
 {% endblock %}
