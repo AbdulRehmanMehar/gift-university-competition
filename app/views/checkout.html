@@ -4,7 +4,7 @@
 
 {% block body %}
     <div>
-        <form action="{{ url_for('app.charge') }}" id="theform" method="post">
+        <form action="{{ url_for('app.charge', cid=cid) }}" id="theform" method="post">
             <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="{{ stripe_pk }}"
                 data-description="Place Order" data-amount="{{ amount * 100 }}" data-locale="auto">
                 
