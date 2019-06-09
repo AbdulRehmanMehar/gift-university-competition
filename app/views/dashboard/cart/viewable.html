@@ -52,14 +52,14 @@
                     {% endfor %}
                     <tr>
                         <td colspan="5" style="text-align: right">
-                            <b>Grand Total</b>: <span id="g-total">{{ count.total }}</span>
+                            <b>Grand Total</b>: $<span id="g-total">{{ count.total }}</span>
                         </td>
                         <!-- <td></td> -->
                     </tr>
                     <tr>
                         <td colspan="5" style="text-align: right">
 <a href="#" class="delete-db-cart btn btn-danger btn-sm" cart-id="{{cid}}">Delete</a>
-<a href="#" class="btn btn-success btn-sm">Checkout</a>
+<a href="{{ url_for('app.checkout', cid=cid) }}" class="btn btn-success btn-sm">Checkout</a>
                         </td>
                         <!-- <td>
                             
