@@ -80,7 +80,7 @@ class Cart:
         if self.cart_id:
             dbc = CartModel.query.filter(CartModel.id == self.cart_id).first()
             return dbc
-        return {'len': 0}
+        return None
 
     def deleteCartFromDatabase(self):
         if self.cart_id:
