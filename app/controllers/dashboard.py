@@ -47,5 +47,5 @@ def order():
 def view_order(id):
     res = Order.query.filter(Order.id == int(id)).first()
     if res:
-        return render_template('dashboard/cart/viewable.html', crt=yaml.load(res.cart), status=res.status, cid=res.id, amount=res.amount)
-    return redirect(url_for('dashboard.cart'))
+        return render_template('dashboard/orders/viewable.html', crt=yaml.load(res.cart), order=res)
+    return redirect(url_for('dashboard.order'))
