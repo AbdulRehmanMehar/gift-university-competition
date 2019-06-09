@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %} Cart {% endblock %}
+
+{% block body %}
+
+<nav aria-label="breadcrumb" class="mt-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item" aria-current="page">
+            <a href="{{ url_for('dashboard.home') }}">Home</a>
+        </li>
+        <li class="breadcrumb-item" aria-current="page">
+            <a href="{{ url_for('dashboard.order') }}">Orders</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Order - ${{order.amount}} | {{order.status}}</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-header">Cart</div>
+    <div class="card-body">
+        <div class="table-responsive" id="the-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <!-- <th>Actions</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set count = namespace(i=1, total=0) %}
+                    {% for key, product in crt.items() %}
+                        {% if key != 'len' %}
+                            <tr id="tr-{{ product.slug }}">
+                                <td>{{ count.i }}</td>
+                                <td>
+                                    <a href="{{ url_for('app.product', slug=product.slug) }}" class="text-dark" target="_blank">
+                                        {{ product.title }}
+                                    </a>
+                                </td>
+                                <td id="{{ product.slug }}-price">{{ product.price }}</td>
+                                <td id="{{ product.slug }}-qtty">{{ product.quantity }}</td>
+                                <td id="{{ product.slug }}-total">{{ product.price * product.quantity }}</td>
+                            </tr>
+                            {% set count.total = count.total + (product.price * product.quantity) %}
+                            {% set count.i = count.i + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    <tr>
+                        <td colspan="5" style="text-align: right">
+                            <b>Grand Total</b>: $<span id="g-total">{{ count.total }}</span>
+                        </td>
+                        <!-- <td></td> -->
+                    </tr>
+                    <tr>
+                        <td colspan="5" style="text-align: right">
+                            {% if order.status == 'Canceled' %}
+                                <p title="Some processing fee might have been applied.">
+                                    ${{order.refund.amount}} was refunded.
+                                </p>
+                            {% elif order.status == 'Completed' %}
+                                <p>The order was completed.</p>
+                            {% else %}
+                                <form action="{{ url_for('app.cancel_order') }}" method="POST">
+                                    <input type="hidden" name="id" value="{{ order.id }}">
+                                    <button class="btn btn-danger btn-sm" type="submit">Cancel</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                        <!-- <td>
+                            
+                        </td> -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
