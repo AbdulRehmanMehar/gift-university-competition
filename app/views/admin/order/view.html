@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}
+    View Categories - Admin Area
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.home') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.order') }}">Orders</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ status|capitalize }} Orders</li>
+                </ol>
+            </nav>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <div class="table-responsive pt-2">
+                        {% if orders %}
+                            <table class="table">
+                            <thead>
+                                <tr>
+                                    <th colspan="6" style="border-top: 0px;">View Orders</th>
+                                </tr>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Placed By</th>
+                                    <th>Stripe Customer ID</th>
+                                    <th>Stripe Charge ID</th>
+                                    <th>Amount</th>
+                                    <th>Info</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set i = namespace(count=1) %}
+                                {% if current_page_number > 1 %}
+                                    {% set i.count = current_page_number + items_per_page - 1 %}
+                                {% endif %}
+                                {% for order in orders %}
+                                    <tr>
+                                        <td>{{ i.count }}</td>
+                                        <td>{{ order.owner.name }}</td>
+                                        <td>{{ order.customer_id }}</td>
+                                        <td>{{ order.charge_id }}</td>
+                                        <td>${{ order.amount }}</td>
+                                        <td>
+                                            <a href="{{ url_for('app.user_profile', uname=order.owner.username) }}" target="_blank">Buyer Info</a>  | 
+                                            <a href="{{ url_for('dashboard.view_order', id=order.id) }}">View Order</a>
+                                        </td>
+                                        <td>
+                                            {% if order.status != 'Canceled' and order.status != 'Completed' %}
+                                                <form action="{{ url_for('admin.update_order') if order.status != 'Canceled' else '#' }}" method="POST" class="d-inline">
+                                                    <input type="hidden" name="id" value="{{order.id}}">
+                                                    <div class="form-group">
+                                                        <select name="status" class="form-control form-control-sm">
+                                                            <option value="Placed" {{ "selected" if order.status == 'Placed' else None }}>Placed</option>
+                                                            <option value="Shipped"  {{ "selected" if order.status == 'Shipped' else None }}>Shipped</option>
+                                                            <option value="Completed"  {{ "selected" if order.status == 'Completed' else None }}>Completed</option>
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                                                </form> | 
+                                                <form action="{{ url_for('app.cancel_order') }}" method="POST" class="d-inline">
+                                                    <input type="hidden" name="id" value="{{ order.id }}">
+                                                    <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                                                </form>
+                                            {% elif order.status == 'Completed' %}
+                                                The order was <b>Completed</b>.
+                                            {% else %}
+                                                <b>Canceled</b>. ${{ order.refund.amount }} was refunded.
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% set i.count = i.count + 1 %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                            <h3>No Order Was Found!</h3>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <nav class="mt-4 float-right">
+                {% set pageCount = namespace(count=1, className='') %}
+                <ul class="pagination">
+                    {% if current_page_number == 1 %}
+                        {% set pageCount.className='disabled' %}
+                    {% endif %}
+                    <li class="page-item {{ pageCount.className }}">
+                        <a class="page-link" href="{{ url_for('admin.order', page=(current_page_number - 1)) }}">
+                            Previous
+                        </a>
+                    </li>
+
+                    {% for page in range(pages) %}
+                        {% set pageCount.count = page + 1 %}
+                        {% if current_page_number == pageCount.count %}
+                            {% set pageCount.className='active' %}
+                        {% else %}
+                            {% set pageCount.className='' %}
+                        {% endif %}
+                        <li class="page-item {{ pageCount.className }}">
+                            <a class="page-link" href="{{ url_for('admin.order', page=pageCount.count) }}">{{ pageCount.count }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if current_page_number == pages %}
+                        {% set pageCount.className='disabled' %}
+                    {% endif %}
+                    <li class="page-item {{ pageCount.className }}">
+                        <a class="page-link" href="{{ url_for('admin.order', page=(current_page_number + 1)) }}">
+                            Next
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+
+{% endblock %}
