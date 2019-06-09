@@ -1,11 +1,12 @@
-import os, stripe
+import os, stripe, yaml
 from .. import app
 from ..utils import Pagination, Cart
-from ..models import db, Category, Product, Order
 from flask_login import login_required, current_user
+from ..models import db, Category, Product, Order, Refund, User
 from flask import Blueprint, render_template, send_file, request, session, abort, flash, redirect, url_for
 
 index = Blueprint('app', __name__)
+stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
 
 @app.context_processor
@@ -25,29 +26,46 @@ def cart():
     return render_template('cart.html')
 
 
-@index.route('/checkout')
+@index.route('/checkout', defaults={'cid': None})
+@index.route('/checkout/<int:cid>')
 @login_required
-def checkout():
-    if session.get('cart').get('len') > 0:
-        amount = 0
-        for key, product in session.get('cart').items():
-            if key != 'len':
-                amount += product.get('price') * product.get('quantity')
-        return render_template('checkout.html', stripe_pk=app.config['STRIPE_PUBLISHABLE_KEY'], amount=amount)
+def checkout(cid):
+    if cid:
+        crt = Cart(None, None, None, int(cid))
+        res = crt.getCartFromDatabase()
+        if res:
+            amount = 0
+            for key, product in yaml.load(res.cart).items():
+                if key != 'len':
+                    amount += product.get('price') * product.get('quantity')
+            return render_template('checkout.html', stripe_pk=app.config['STRIPE_PUBLISHABLE_KEY'], amount=amount, cid=cid)
+    else:
+        if session.get('cart').get('len') > 0:
+            amount = 0
+            for key, product in session.get('cart').items():
+                if key != 'len':
+                    amount += product.get('price') * product.get('quantity')
+            return render_template('checkout.html', stripe_pk=app.config['STRIPE_PUBLISHABLE_KEY'], amount=amount, cid=cid)
     flash('It seems that you\'re cart is empty.', 'danger')
     return redirect(url_for('app.cart'))
 
 
-@index.route('/charge', methods=['POST'])
+@index.route('/charge', methods=['POST'], defaults={'cid': None})
+@index.route('/charge/<int:cid>', methods=['POST'])
 @login_required
-def charge():
-    stripe.api_key = app.config['STRIPE_SECRET_KEY']
+def charge(cid):
     try:
         amount = 0
-        for key, product in session.get('cart').items():
-            if key != 'len':
-                amount += product.get('price') * product.get('quantity')
-
+        crt = Cart(None, None, None, int(cid) if cid else None)
+        res = crt.getCartFromDatabase()
+        if res:
+            for key, product in yaml.load(res.cart).items():
+                if key != 'len':
+                    amount += product.get('price') * product.get('quantity')
+        else:
+            for key, product in session.get('cart').items():
+                if key != 'len':
+                    amount += product.get('price') * product.get('quantity')
         customer = stripe.Customer.create(
             email = current_user.email,
             source = request.form['stripeToken']
@@ -59,15 +77,43 @@ def charge():
             currency = 'usd',
             description = 'ordered'
         )
-        ordr = Order('Placed', amount, f'{session.get("cart")}', current_user.id)
+        ordr = Order('Placed', amount, res.cart if res else f'{session.get("cart")}', current_user.id, charge.id, customer.id)
         db.session.add(ordr)
         db.session.commit()
-        crt = Cart(None, None)
-        crt.deleteTheCart()
+        if res:
+            crt.deleteCartFromDatabase() 
+        else: 
+            crt.deleteTheCart()
         return redirect(url_for('dashboard.order'))
     except:
         flash('Something went seriously wrong.', 'danger')
         return redirect(url_for('app.cart'))
+
+
+@index.route('/refund/<int:id>', defaults={'fee': 1})
+@index.route('/refund/<int:id>/<int:fee>')
+@login_required
+def refund(id, fee):
+    ordr = Order.query.filter(Order.id == id).first()
+    try:
+        if ordr:
+            # Refunds will be 75% of the amount, 25% will be fee
+            amount = int(ordr.amount * 75 / 100) if fee == 1 else ordr.amount
+            ref = stripe.Refund.create(
+                charge=ordr.charge_id,
+                amount=amount * 100 # in cents..
+            )
+            refund = Refund(amount, ref.id, ordr.id)
+            db.session.add(refund)
+            db.session.commit()
+            flash(f'{amount} was refunded to you!', 'success')
+            return redirect(url_for('dashboard.view_order', id=id))
+        else:
+            flash('Something went seriously wrong.', 'danger')
+            return redirect(url_for('dashboard.order'))
+    except:
+        flash('Something went seriously wrong.', 'danger')
+        return redirect(url_for('dashboard.order'))
 
 
 @index.route('/cart-len', methods=['POST'])
@@ -119,6 +165,27 @@ def delete_db_cart():
         flash('Cart was removed from database successfully.', 'info')
         return 'Done'
     return abort(500)
+
+
+@index.route('/cancel-order', methods=['POST'])
+@login_required
+def cancel_order():
+    id = int(request.form['id'])
+    ordr = Order.query.filter(Order.id == id).first()
+    if ordr and ordr.status != 'Canceled' and ordr.status != 'Completed' and (current_user.admin or current_user.id == ordr.owner.id):
+        ordr.status = 'Canceled'
+        db.session.commit()
+        if current_user.id == ordr.owner.id:
+            return redirect(url_for('app.refund', id=id))
+        else:
+            return redirect(url_for('app.refund', id=id, fee=0))
+    return redirect(url_for('dashboard.order')) 
+
+
+@index.route('/user-profile/<string:uname>')
+def user_profile(uname):
+    user = User.query.filter(User.username == uname).first()
+    return render_template('user.html', user=user)
 
 
 @index.route('/category/<string:slug>', defaults={'page': 1})
