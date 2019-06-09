@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Manage Categories - Admin Area
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.home') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Orders</li>
+                </ol>
+            </nav>
+
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Placed Orders</h5>
+                    <p class="card-text">View new orders.</p>
+                    <a href="{{ url_for('admin.view_order', status='placed') }}" class="btn btn-info" style="float: right;">Go</a>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Shipped Orders</h5>
+                    <p class="card-text">Orders just got shipped.</p>
+                    <a href="{{ url_for('admin.view_order', status='shipped') }}" class="btn btn-info" style="float: right;">Go</a>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Canceled Orders</h5>
+                    <p class="card-text">Orders just got canceled.</p>
+                    <a href="{{ url_for('admin.view_order', status='canceled') }}" class="btn btn-info" style="float: right;">Go</a>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Completed Orders</h5>
+                    <p class="card-text">Orders just got completed.</p>
+                    <a href="{{ url_for('admin.view_order', status='completed') }}" class="btn btn-info" style="float: right;">Go</a>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+{% endblock %}
