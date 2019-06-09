@@ -3,7 +3,7 @@ from .. import app
 from flask import abort, flash, Blueprint, render_template, request, redirect, url_for
 from flask_login import current_user
 from ..forms import AddCategoryForm, UpdateCategoryForm, AddProductForm, UpdateProductForm, PhotoUploadForm
-from ..models import db, Category, Product
+from ..models import db, Category, Product, Order
 from ..utils import Pagination
 
 admin = Blueprint('admin', __name__)
@@ -152,3 +152,35 @@ def view_products(page):
                            items_per_page=paginator.get_items_per_page(),
                            current_page_number=paginator.get_current_page_number()
                            )
+
+
+# Order Routes
+
+
+@admin.route('/order')
+def order():
+    return render_template('admin/order/home.html')
+
+
+@admin.route('/order/view', defaults={'status': 'placed', 'page': 1})
+@admin.route('/order/view/<int:page>', defaults={'status': 'placed'})
+@admin.route('/order/view/<string:status>', defaults={'page': 1})
+@admin.route('/order/view/<string:status>/<int:page>')
+def view_order(status, page):
+    paginator = Pagination(Order, 10, page, Order.status == status.capitalize())
+    return render_template('admin/order/view.html',
+                           status=status,
+                           pages=paginator.pages,
+                           orders=paginator.get_results(),
+                           items_per_page=paginator.get_items_per_page(),
+                           current_page_number=paginator.get_current_page_number()
+                           )
+
+
+@admin.route('/order/update', methods=['POST'])
+def update_order():
+    ordr = Order.query.filter(Order.id == request.form['id']).first()
+    if ordr and ordr.status != request.form['status'] and ordr.status != 'Canceled' and ordr.status != 'Completed':
+        ordr.status = request.form['status']
+        db.session.commit()
+    return redirect(url_for('admin.order'))
