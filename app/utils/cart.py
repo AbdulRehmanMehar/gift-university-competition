@@ -11,8 +11,8 @@ class Cart:
         self.product = Product.query.filter(Product.slug == p_slug).first()
 
     def addToCart(self):
-        if self.product:
-            if session.get('cart'):
+        if self.product and self.product.quantity >= self.quantity:
+            if session.get('cart') and session.get('cart').get(f'p-{self.product.id}') and session.get('cart').get(f'p-{self.product.id}').get('quantity') + self.quantity <= self.product.quantity:
                 old = session.get('cart').get(f'p-{self.product.id}')
                 if old:
                     session['cart']['len'] = session['cart']['len'] + self.quantity
@@ -45,7 +45,7 @@ class Cart:
         return False
 
     def updateTheCart(self):
-        if self.product and session.get('cart'):
+        if self.product and self.product.quantity >= self.quantity and session.get('cart'):
             length = session['cart']['len'] - \
                 session['cart'][f'p-{self.product.id}']['quantity']
             session['cart']['len'] = length + self.quantity
