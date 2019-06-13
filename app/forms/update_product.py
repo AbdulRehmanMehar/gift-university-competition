@@ -1,4 +1,4 @@
-from wtforms import Form, IntegerField, TextAreaField, StringField, validators
+from wtforms import Form, IntegerField, TextAreaField, StringField, SelectField, validators
 from ..models import Category, Product
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -18,6 +18,16 @@ class UpdateProductForm(Form):
         validators.DataRequired(),
     ], description='150 usd')
 
+
+    quantity = IntegerField('Quantity', [
+        validators.DataRequired(),
+    ], description='100')
+
+    featured = SelectField('Featured', [
+        validators.DataRequired()
+    ], choices=[('False', 'No'), ('True', 'Yes')])
+
+
     description = TextAreaField('Description', [
         validators.DataRequired(),
         validators.length(min=100, max=1500)
@@ -28,5 +38,7 @@ class UpdateProductForm(Form):
     def set_default(self, prod):
         self.title.data = prod.title
         self.price.data = prod.price
+        self.quantity.data = prod.quantity
+        self.featured.data = 'True' if prod.featured else 'False'
         self.category.data = prod.category
         self.description.data = prod.description
