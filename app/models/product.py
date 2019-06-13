@@ -8,15 +8,19 @@ class Product(db.Model):
     title = db.Column(db.String, nullable=False)
     slug = db.Column(db.String, nullable=False, unique=True)
     price = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    featured = db.Column(db.Boolean, default=False)
     description = db.Column(db.String(1500), nullable=False)
     photo = db.Column(db.String, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     category = db.relationship('Category', backref=db.backref('products', uselist=True))
 
-    def __init__(self, title, price, description, photo, category):
+    def __init__(self, title, price, quantity, featured,description, photo, category):
         self.title = title
         self.price = price
         self.photo = photo
+        self.quantity = quantity
+        self.featured = featured
         self.category_id = category
         self.description = description
         self.slug = self.set_slug(title)
