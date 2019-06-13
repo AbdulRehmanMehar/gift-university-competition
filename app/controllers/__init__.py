@@ -81,8 +81,18 @@ def charge(cid):
         db.session.add(ordr)
         db.session.commit()
         if res:
+            for key, product in yaml.load(res.cart).items():
+                if key != 'len':
+                    prod = Product.query.filter(Product.id == int(product.get('pid'))).first()
+                    prod.quantity -= int(product.get('quantity'))
+                    db.session.commit()
             crt.deleteCartFromDatabase() 
         else: 
+            for key, product in session.get('cart').items():
+                if key != 'len':
+                    prod = Product.query.filter(Product.id == int(product.get('pid'))).first()
+                    prod.quantity -= int(product.get('quantity'))
+                    db.session.commit()
             crt.deleteTheCart()
         return redirect(url_for('dashboard.order'))
     except:
@@ -103,9 +113,17 @@ def refund(id, fee):
                 charge=ordr.charge_id,
                 amount=amount * 100 # in cents..
             )
+            
             refund = Refund(amount, ref.id, ordr.id)
             db.session.add(refund)
             db.session.commit()
+
+            for key, product in yaml.load(ordr.cart).items():
+                if key != 'len':
+                    prod = Product.query.filter(
+                        Product.id == int(product.get('pid'))).first()
+                    prod.quantity += int(product.get('quantity'))
+                    db.session.commit()
             flash(f'{amount} was refunded to you!', 'success')
             return redirect(url_for('dashboard.view_order', id=id))
         else:
@@ -126,14 +144,14 @@ def add_to_cart(slug):
     crt = Cart(slug, int(request.form['quantity']))
     if crt.addToCart():
         return 'Good'
-    return abort(500)
+    return abort(500, {'message': 'It seems that something went wrong.'})
 
 @index.route('/update-cart/<string:slug>', methods=['POST'])
 def update_cart(slug):
     crt = Cart(slug, int(request.form['quantity']))
     if crt.updateTheCart():
         return 'Good'
-    return abort(500)
+    return abort(500, {'message': 'It seems that something went wrong.'})
 
 
 @index.route('/remove-from-cart/<string:slug>', methods=['POST'])
@@ -141,7 +159,7 @@ def remove_cart(slug):
     crt = Cart(slug, None)
     if crt.removeFromCart():
         return 'good'
-    return abort(500)
+    return abort(500, {'message': 'It seems that something went wrong.'})
 
 
 @index.route('/save-cart', methods=['POST'])
@@ -152,7 +170,7 @@ def save_cart():
     if crt.saveToDatabase():
         flash('Cart was saved to database successfully.', 'success')
         return 'Very Good'
-    return abort(500)
+    return abort(500, {'message': 'It seems that something went wrong.'})
 
 
 
