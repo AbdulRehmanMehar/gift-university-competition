@@ -34,17 +34,26 @@ class Pagination:
             return self.list[st_idx: end_idx]
         except AttributeError:
             if self.current_page_number == 1:
-                return self.model.query\
-                        .filter(self.filter)\
+                if self.filter:
+                    return self.model.query\
+                            .filter(self.filter)\
+                            .limit(self.items_per_page)\
+                            .all()
+                else:
+                    return self.model.query\
                         .limit(self.items_per_page)\
                         .all()
 
             elif self.current_page_number <= self.total_pages:
 
-                return self.model.query\
+                if self.filter:
+                    return self.model.query\
                         .filter(self.filter)\
                         .limit(self.items_per_page)\
-                        .offset((self.current_page_number - 1) * self.items_per_page)\
+                        .all()
+                else:
+                    return self.model.query\
+                        .limit(self.items_per_page)\
                         .all()
 
             return None
