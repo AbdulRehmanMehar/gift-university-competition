@@ -96,7 +96,7 @@ def add_product():
     if request.method == 'POST' and form.validate() and photo_form.validate():
         cat = Category.query.filter(Category.name == str(form.category.data)).first()
         file = f'{form.title.data}.{photo_form.ext}'
-        prod = Product(form.title.data, form.price.data, form.description.data, file, cat.id)
+        prod = Product(form.title.data, form.price.data, form.quantity.data, form.featured.data == 'True', form.description.data, file, cat.id)
         photo = request.files[photo_form.photo.name]
         photo.save(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', file))
         db.session.add(prod)
@@ -134,6 +134,8 @@ def update_product(id):
         prod.title = form.title.data
         prod.price = form.price.data
         prod.category_id = cat.id
+        prod.quantity = form.quantity.data
+        prod.featured = form.featured.data == 'True'
         prod.photo = file
         prod.description = form.description.data
         db.session.commit()
