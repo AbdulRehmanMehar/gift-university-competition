@@ -18,7 +18,8 @@ def inject():
 
 @index.route('/')
 def home():
-    return render_template('index.html')
+    featured = Product.query.filter(Product.featured == True).all()
+    return render_template('index.html', featured=featured)
 
 
 @index.route('/cart')

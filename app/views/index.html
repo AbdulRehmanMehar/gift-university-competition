@@ -4,6 +4,119 @@
 
 {% block body %}
 
-<h1>Hello World</h1>
+{% if featured|length > 0 %}
+    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+            {% set a = namespace(i=0) %}
+            {% for product in featured %}
+                <li data-target="#carouselExampleIndicators" data-slide-to="{{a.i}}" class="{{'active' if a.i == 0 else ''}}"></li>
+            {% set a.i = a.i + 1 %}
+            {% endfor %}
+        </ol>
+    <div class="carousel-inner">
+        {% set count = namespace(i=0) %}
+            {% for product in featured %}
+                <div class="carousel-item {{ 'active' if count.i == 0 else ''  }}">
+                    <a href="{{ url_for('app.product', slug=product.slug) }}" title="View Details">
+                        <div class="bg-image"
+                            style="height: 60vh; width: 100%; background-image: url({{ url_for('app.product_photo', slug=product.slug) }})">
+                            <div style="height: 400px; width: 100%; background-color: rgba(0,0,0,0.5)"></div>
+                        </div>
+                    </a>
+                    <div class="carousel-caption d-none d-md-block text-left">
+                        <h5>{{ product.title }}</h5>
+                        <p>Price: {{product.price}}</p>
+                    </div>
+                </div>
+                {% set count.i = count.i + 1 %}
+            {% endfor %}
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+{% endif %} 
+
+<div class="clearfix"></div>
+
+{% if categories|length > 0 %}
+    {% set cat = namespace(i=0) %}
+    {% if cat.i < 3 %}
+        {% for category in categories %}
+            {% if category.products|length > 3 %}
+            <div class="my-4">
+                <h3 class="text-center mt-4">{{ category.name }}</h3>
+                <p style="text-align: right"><a href="{{ url_for('app.category', slug=category.slug) }}">More</a></p>
+                <div class="row my-4 mx-auto">
+                    {% set resp = namespace(col_size=4, offset=0, count=1) %}
+                    {% if category.products|length == 1 %}
+                    {% set resp.offset = 4 %}
+                    {% set resp.col_size = 4 %}
+                    {% elif category.products|length == 2 %}
+                    {% set resp.offset = 2 %}
+                    {% set resp.col_size = 4 %}
+                    {% endif %}
+                    <div class="offset-md-{{ resp.offset }}"></div>
+                    {% for product1 in category.products %}
+                    {% if resp.count <= 3 %}
+                        <div class="col-md-{{resp.col_size}}">
+                            <div class="card d-shadow my-4">
+                                <div class="bg-image"
+                                    style="height: 200px; width: 100%; background-image: url({{ url_for('app.product_photo', slug=product1.slug) }})">
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a href="{{ url_for('app.product', slug=product1.slug) }}" class="text-dark"
+                                            id="p-{{ resp.count }}">
+                                            {{ product1.title }}
+                                        </a>
+                                    </h5>
+                                    <p>
+                                        Price: {{ product1.price }} usd
+                                    </p>
+                                    <p>
+                                        Stock: {{ product1.quantity }} items left.
+                                    </p>
+                                    {% if product1.quantity > 0 %}
+                                    <form action="#" class="add-to-cart-from" id="form-{{ product1.id }}">
+                                        <div class="form-row">
+                                            <div class="form-group col-9">
+                                                <input type="number" class="form-control" id="p-qtty-{{ product1.id }}" value="1" min="1"
+                                                    max="{{ product1.quantity }}">
+                                                <input type="hidden" id="p-slug-{{ product1.id }}" value="{{ product1.slug }}">
+                                            </div>
+                                            <div class="form-group col-3">
+                                                <button type="submit" class="btn btn-outline-dark form-control">
+                                                    <i class="fas fa-cart-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    {% else %}
+                                    <h6>Sorry the item is currently out of stock.</h6>
+                                    <h6>&nbsp;</h6>
+                                    {% endif %}
+                                    <a href="{{ url_for('app.product', slug=product1.slug) }}" class="form-control btn btn-outline-dark">
+                                        <i class="fas fa-eye"></i> View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% set resp.count = resp.count + 1 %}
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            <!-- </div> -->
+            {% endif %}
+            {% set cat.i=cat.i+1 %}
+        {% endfor %}
+    {% endif %}
+{% endif %}
+
 
 {% endblock %}
