@@ -1,4 +1,4 @@
 from app import app
 
 def run():
-    app.run(debug=True)
+    app.run()
