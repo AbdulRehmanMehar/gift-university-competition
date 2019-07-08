@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Manage Categories - Admin Area
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.home') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Manufacturers</li>
+                </ol>
+            </nav>
+
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">View Manufacturers</h5>
+                    <p class="card-text">View all Manufacturers.</p>
+                    <a href="{{ url_for('admin.view_manufacturers') }}" class="btn btn-info" style="float: right;">Go</a>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Add Manufacturers</h5>
+                    <p class="card-text">Add Manufacturers for your products.</p>
+                    <a href="{{ url_for('admin.add_manufacturers') }}" class="btn btn-info" style="float: right;">Go</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

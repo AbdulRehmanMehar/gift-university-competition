@@ -1,0 +1,39 @@
+{% from "_formsHelper.html" import render_field %}
+
+{% extends "base.html" %}
+
+{% block title %}
+   Add Category - Admin Area
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <nav aria-label="breadcrumb" class="mt-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.home') }}">Home</a>
+                    </li>
+                    <li class="breadcrumb-item" aria-current="page">
+                        <a href="{{ url_for('admin.manufacturers') }}">Manufacturers</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Add</li>
+                </ol>
+            </nav>
+
+            <div class="card mt-4">
+                <div class="card-header">Add Manufacturer</div>
+                <div class="card-body">
+                    <form action="{{ url_for('admin.add_manufacturers') }}" method="POST">
+                        <div class="form-group">
+                            <input class="form-control" type="text" name="name" placeholder="Samsung" required>
+                        </div>
+                        <button type="submit" class="form-control btn btn-info">Add Manufacturer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
