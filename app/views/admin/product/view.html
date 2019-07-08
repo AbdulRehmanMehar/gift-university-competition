@@ -33,9 +33,11 @@
                                     <th>#</th>
                                     <th>Name</th>
                                     <th>Price</th>
+                                    <th>Owner</th>
                                     <th>Featured</th>
                                     <th>Quantity</th>
                                     <th>Category</th>
+                                    <th>Manufacturer</th>
                                     <th colspan="3">Actions</th>
                                 </tr>
                             </thead>
@@ -49,12 +51,16 @@
                                         <td>{{ i.count }}</td>
                                         <td>{{ product.title }}</td>
                                         <td>{{ product.price }}</td>
+                                        <td>{{ product.owner.name }}</td>
                                         <td>{{ product.featured }}</td>
                                         <td>{{ product.quantity }}</td>
                                         <td>
                                             <a href="{{ url_for('app.category', slug=product.category.slug) }}" class="text-dark" target="_blank">
                                                 {{ product.category }}
                                             </a>
+                                        </td>
+                                        <td>
+                                            {{ product.manufacturer.name }}
                                         </td>
                                         <td>
                                             <a href="{{ url_for('app.product', slug=product.slug) }}" class="text-dark" target="_blank">
