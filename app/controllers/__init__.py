@@ -1,8 +1,9 @@
 import os, stripe, yaml
-from .. import app
+from .. import app, mail
 from ..utils import Pagination, Cart
+from sqlalchemy.sql import desc
 from flask_login import login_required, current_user
-from ..models import db, Category, Product, Order, Refund, User, Review
+from ..models import db, Category, Product, Order, Refund, User, Review, Manufactures
 from flask import Blueprint, render_template, send_file, request, session, abort, flash, redirect, url_for
 
 index = Blueprint('app', __name__)
@@ -12,14 +13,36 @@ stripe.api_key = app.config['STRIPE_SECRET_KEY']
 @app.context_processor
 def inject():
     cat = Category.query.all()
+    man = Manufactures.query.all()
     cart = session.get('cart') if session.get('cart') else {'len': 0}
-    return dict(categories=cat, cart=cart)
+    return dict(categories=cat, cart=cart, manufacturers=man)
 
 
 @index.route('/')
 def home():
     featured = Product.query.filter(Product.featured == True).all()
-    return render_template('index.html', featured=featured)
+    newest = Product.query.order_by(desc(Product.created_at)).limit(3).all()
+    return render_template('index.html', featured=featured, newest=newest)
+
+
+@index.route('/search', defaults={'page': 1})
+@index.route('/search/<int:page>')
+def search(page):
+    data = request.args.get('data').strip()
+    cat = Category.query.filter(Category.name == data).first()
+    man = Manufactures.query.filter(Manufactures.name == data).first()
+    paginator = Pagination(Product, 10, page, Product.name == data or (
+        Product.category_id == cat.id) if cat else None or (Product.manufacturer_id == man.id) if man else None)
+    return render_template('products.html',
+                           category={
+                               'name': data
+                           },
+                           pages=paginator.pages,
+                           products=paginator.get_results(),
+                           items_per_page=paginator.get_items_per_page(),
+                           current_page_number=paginator.get_current_page_number()
+                           )
+    return 
 
 
 @index.route('/cart')
@@ -95,6 +118,14 @@ def charge(cid):
                     prod.quantity -= int(product.get('quantity'))
                     db.session.commit()
             crt.deleteTheCart()
+       
+
+            mail.send_email(
+                to_email=[{'email': current_user.email}],
+                subject='Information',
+                html='<h1>Hey ' + current_user.name + f'</h1><p>An order has been placed from your account at {config["APP_NAME"]}. Please click <a href=\'{url_for("dashboard.order")}\'>here to see the order.</a></p>'
+            )
+
         return redirect(url_for('dashboard.order'))
     except:
         flash('Something went seriously wrong.', 'danger')
@@ -118,6 +149,12 @@ def refund(id, fee):
             refund = Refund(amount, ref.id, ordr.id)
             db.session.add(refund)
             db.session.commit()
+
+            mail.send_email(
+                to_email=[{'email': current_user.email}],
+                subject='Information',
+                html='<h1>Hey ' + current_user.name + f'</h1><p>An order was canceld by your account at {config["APP_NAME"]}. Please click <a href=\'{url_for("dashboard.order")}\'>here to see the order.</a></p>'
+            )
 
             for key, product in yaml.load(ordr.cart).items():
                 if key != 'len':
@@ -238,8 +275,10 @@ def product_photo(slug):
 @login_required
 def leave_review():
     pid = request.form.get('product_id')
-    rating = request.form.get('rating')
-    if pid != None and rating > 0 and rating <= 5:
+    rating = int(request.form.get('rating'))
+    review = Review.query.filter(Review.reviewer_id == current_user.id and Review.product_id == pid).first()
+    print(review)
+    if not review and rating > 0 and rating <= 5:
         review = Review(rating, pid, current_user.id)
         db.session.add(review)
         db.session.commit()
@@ -271,8 +310,21 @@ def delete_review():
 
 
 
+@index.route('/manufacturer/<string:slug>')
+def manufacturers(slug):
+    return slug
 
 
+
+@index.route('/change-account-type')
+@login_required
+def change_account_type():
+    usr = User.query.filter(User.id == current_user.id).first()
+    usr.business = True
+    db.session.commit()
+    flash('Your account is now converted to Business account.', 'success')
+    redir = request.args.get('next') or request.referrer or url_for('app.home')
+    return redirect(redir)
 
 
 # IMPORT other controllers
