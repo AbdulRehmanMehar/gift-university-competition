@@ -68,7 +68,7 @@ def add_address():
             db.session.commit()
         return redirect(url_for('dashboard.address_book'))
 
-    return render_template('dashboard/addressbook/home.html')
+    return render_template('dashboard/addressbook/add.html')
 
 
 @dashboard.route('/address-book/edit/<int:id>', methods=['GET', 'POST'])
@@ -78,9 +78,9 @@ def update_address(id):
         address.name = request.form.get('name').strip()
         address.address = request.form.get('address').strip()
         db.session.commit()
-        return redirect(url_for('dashboard.address_book'))
+        return redirect(url_for('dashboard.view_address_book'))
 
-    return render_template('dashboard/addressbook/home.html', address=address)
+    return render_template('dashboard/addressbook/edit.html', address=address)
 
 
 @dashboard.route('/address-book/delete/<int:id>')
