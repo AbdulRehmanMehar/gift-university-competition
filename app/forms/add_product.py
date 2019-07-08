@@ -1,10 +1,15 @@
 from wtforms import Form, IntegerField, TextAreaField, StringField, SelectField, validators
-from ..models import Category
+from ..models import Category, Manufactures
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 
 def get_cats():
     return Category.query
+
+
+def get_mans():
+    return Manufactures.query
+
 
 
 class AddProductForm(Form):
@@ -31,4 +36,7 @@ class AddProductForm(Form):
         validators.length(min=100, max=1500)
     ], description='Anything about the product')
 
-    category = QuerySelectField('Category', query_factory=get_cats, get_pk=lambda a: a.id, get_label=lambda a: a.name, allow_blank=False)
+    category = QuerySelectField('Category', query_factory=get_cats,
+                                get_pk=lambda a: a.id, get_label=lambda a: a.name, allow_blank=False)
+    manufacturer = QuerySelectField('Manufacturer', query_factory=get_mans,
+                                get_pk=lambda a: a.id, get_label=lambda a: a.name, allow_blank=False)
