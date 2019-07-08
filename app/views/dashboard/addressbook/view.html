@@ -11,10 +11,10 @@
             <nav aria-label="breadcrumb" class="mt-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item" aria-current="page">
-                        <a href="{{ url_for('admin.home') }}">Home</a>
+                        <a href="{{ url_for('dashboard.home') }}">Home</a>
                     </li>
                     <li class="breadcrumb-item" aria-current="page">
-                        <a href="{{ url_for('admin.address_book') }}">Address Book</a>
+                        <a href="{{ url_for('dashboard.address_book') }}">Address Book</a>
                     </li>
                     <li class="breadcrumb-item active" aria-current="page">View</li>
                 </ol>
@@ -47,12 +47,12 @@
                                         <td>{{ address.name }}</td>
                                         <td>{{ address.address }}</td>
                                         <td>
-                                            <a href="{{ url_for('admin.update_address', id=address.id) }}" class="text-dark">
+                                            <a href="{{ url_for('dashboard.update_address', id=address.id) }}" class="text-dark">
                                                 <i class="fas fa-pencil-alt"></i> Edit
                                             </a>
                                         </td>
                                         <td>
-                                            <a href="{{ url_for('admin.delete_address', id=address.id) }}" class="text-dark">
+                                            <a href="{{ url_for('dashboard.delete_address', id=address.id) }}" class="text-dark">
                                                 <i class="fas fa-trash"></i> Delete
                                             </a>
                                         </td>
@@ -63,7 +63,7 @@
                         </table>
                         {% else %}
                             <h3>No Address Was Found!</h3>
-                            <a href="{{ url_for('admin.add_address') }}">Add One?</a>
+                            <a href="{{ url_for('dashboard.add_address') }}">Add One?</a>
                         {% endif %}
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                         {% set pageCount.className='disabled' %}
                     {% endif %}
                     <li class="page-item {{ pageCount.className }}">
-                        <a class="page-link" href="{{ url_for('admin.view_address_books', page=(current_page_number - 1)) }}">
+                        <a class="page-link" href="{{ url_for('dashboard.view_address_book', page=(current_page_number - 1)) }}">
                             Previous
                         </a>
                     </li>
@@ -89,7 +89,7 @@
                             {% set pageCount.className='' %}
                         {% endif %}
                         <li class="page-item {{ pageCount.className }}">
-                            <a class="page-link" href="{{ url_for('admin.view_address_book', page=pageCount.count) }}">{{ pageCount.count }}</a>
+                            <a class="page-link" href="{{ url_for('dashboard.view_address_book', page=pageCount.count) }}">{{ pageCount.count }}</a>
                         </li>
                     {% endfor %}
 
@@ -97,7 +97,7 @@
                         {% set pageCount.className='disabled' %}
                     {% endif %}
                     <li class="page-item {{ pageCount.className }}">
-                        <a class="page-link" href="{{ url_for('admin.view_address_book', page=(current_page_number + 1)) }}">
+                        <a class="page-link" href="{{ url_for('dashboard.view_address_book', page=(current_page_number + 1)) }}">
                             Next
                         </a>
                     </li>

@@ -44,6 +44,77 @@
 
 <div class="clearfix"></div>
 
+{% if newest|length>0 %}
+
+    <div class="my-4">
+        <h3 class="text-center mt-4">Recently Added</h3>
+        {#<!-- <p style="text-align: right"><a href="{{ url_for('app.category', slug=category.slug) }}">More</a></p> -->#}
+        <div class="row my-4 mx-auto">
+            {% set resp = namespace(col_size=4, offset=0, count=1) %}
+            {% if newest|length == 1 %}
+            {% set resp.offset = 4 %}
+            {% set resp.col_size = 4 %}
+            {% elif newest|length == 2 %}
+            {% set resp.offset = 2 %}
+            {% set resp.col_size = 4 %}
+            {% endif %}
+            <div class="offset-md-{{ resp.offset }}"></div>
+            {% for product1 in newest %}
+             {% if resp.count <= 3 %}
+             <div class="col-md-{{resp.col_size}}">
+                 <div class="card d-shadow my-4">
+                     <div class="bg-image"
+                         style="height: 200px; width: 100%; background-image: url({{ url_for('app.product_photo', slug=product1.slug) }})">
+                     </div>
+                     <div class="card-body">
+                         <h5 class="card-title">
+                             <a href="{{ url_for('app.product', slug=product1.slug) }}" class="text-dark"
+                                 id="p-{{ resp.count }}">
+                                 {{ product1.title }}
+                             </a>
+                         </h5>
+                         <p>
+                             Price: {{ product1.price }} usd
+                         </p>
+                         <p>
+                             Stock: {{ product1.quantity }} items left.
+                         </p>
+                         {% if product1.quantity > 0 %}
+                         <form action="#" class="add-to-cart-from" id="form-{{ product1.id }}">
+                             <div class="form-row">
+                                 <div class="form-group col-9">
+                                     <input type="number" class="form-control" id="p-qtty-{{ product1.id }}" value="1"
+                                         min="1" max="{{ product1.quantity }}">
+                                     <input type="hidden" id="p-slug-{{ product1.id }}" value="{{ product1.slug }}">
+                                 </div>
+                                 <div class="form-group col-3">
+                                     <button type="submit" class="btn btn-outline-dark form-control">
+                                         <i class="fas fa-cart-plus"></i>
+                                     </button>
+                                 </div>
+                             </div>
+                         </form>
+                         {% else %}
+                         <h6>Sorry the item is currently out of stock.</h6>
+                         <h6>&nbsp;</h6>
+                         {% endif %}
+                         <a href="{{ url_for('app.product', slug=product1.slug) }}"
+                             class="form-control btn btn-outline-dark">
+                             <i class="fas fa-eye"></i> View Details
+                         </a>
+                     </div>
+                 </div>
+             </div>
+             {% set resp.count = resp.count + 1 %}
+             {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+{% endif %}
+
+<div class="clearfix"></div>
+
 {% if categories|length > 0 %}
     {% set cat = namespace(i=0) %}
     {% if cat.i < 3 %}

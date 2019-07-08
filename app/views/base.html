@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/rating.css">
     <title>{% block title %} {% endblock %} - {{ config['APP_NAME'] }}</title>
 </head>
 
@@ -40,21 +41,105 @@
                            <i class="fas fa-home"></i> Home
                         </a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-layer-group"></i> Categories
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            {% if categories %}
-                                {% for category in categories %}
-                                    <a class="dropdown-item" href="{{ url_for('app.category', slug=category.slug) }}">
-                                        {{ category.name }}
-                                    </a>
-                                {% endfor %}
+                    {% if categories %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-layer-group"></i> Categories
+                            </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    {% for category in categories %}
+                                        <a class="dropdown-item" href="{{ url_for('app.category', slug=category.slug) }}">
+                                            {{ category.name }}
+                                        </a>
+                                    {% endfor %}
+                                    
+                                </div>
                                 
-                            {% endif %}
+                        </li>
+                    {% endif %}
+
+                    {% if manufacturers %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-snowman"></i> Manufacturers
+                            </a>
+
+
+                            
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+
+                                {% for manufacture in manufacturers %}
+                                <a class="dropdown-item" href="{{ url_for('app.manufacturers', slug=manufacture.slug) }}">
+                                    {{ manufacture.name }}
+                                </a>
+                                {% endfor %}
+
+                            </div>
+                            
+                        </li>
+                    {% endif %}
+
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                             <i class="fas fa-search"></i>
+                             Search
+                        </a>
+
+
+
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown" style="width: 200px; margin: 0 auto; padding: 0px 10px; padding-top: 20px;">
+
+                            <form action="{{ url_for('app.search') }}">
+                                <!-- <div class="form-row">
+                                    <div class="form-group col-12">
+                                    </div>
+                                    <div class="form-group col-3">
+                                        <button type="submit" class="btn btn-outline-dark form-control form-control-sm   btn-sm">
+                                            <i class="fas fa-cart-plus"></i>
+                                        </button>
+                                    </div>
+                                </div> -->
+                                
+                                <input type="text" class="form-control form-control-sm" name="data" placeholder="Search...">
+
+                                <hr>
+
+                                <!-- <div style="margin: 0 auto; text-align:center; padding-bottom: 10px;">
+                                    <h4>Filter: </h4>
+                                    <div style="margin-bottom: 2px;">
+                                        <span style="display: inline-block; text-align: left; width: 90px;">Price: </span>
+
+                                        <input type="number" class="form-control form-control-sm" name="price"
+                                            placeholder="range" style="display: inline-block; width: 70px">
+                                    </div>
+                                    <div style="margin-bottom: 2px;">
+                                        <span style="display: inline-block; text-align: left; width: 90px;">Rating: </span> <input
+                                            type="number" class="form-control form-control-sm" name="rating"
+                                            placeholder="rating" style="display: inline-block; width: 70px">
+                                    </div>
+                                    <div style="margin-bottom: 7px;">
+                                        <span style="display: inline-block; text-align: left; width: 90px;">Remaining: </span> <input
+                                            type="number" class="form-control form-control-sm" name="stock"
+                                            placeholder="stock" style="display: inline-block; width: 70px">
+                                    </div> -->
+                                    <div style="width: 160px; margin: 0 auto">
+                                        <button class="btn-dark btn-sm form-control form-control-sm" type="submit">Search</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                      </li>
+
+                    </li>
+
+                    <!-- <li class="nav-item">
+                        <a href="{{ url_for('app.search') }}" class="nav-link">
+                            <i class="fas fa-search"></i>
+                            Search
+                        </a>
+                    </li> -->
                 </ul>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">

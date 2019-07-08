@@ -14,6 +14,14 @@
 
         <div class="card mt-4">
             <div class="card-body">
+                <h5 class="card-title">Address Book</h5>
+                <p class="card-text">View or Delete your addresses.</p>
+                <a href="{{ url_for('dashboard.address_book') }}" class="btn btn-info" style="float: right;">Go</a>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
                 <h5 class="card-title">Saved Cart</h5>
                 <p class="card-text">View or Delete your saved cart.</p>
                 <a href="{{ url_for('dashboard.cart') }}" class="btn btn-info" style="float: right;">Go</a>

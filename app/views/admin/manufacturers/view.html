@@ -45,7 +45,10 @@
                                         <td>{{ i.count }}</td>
                                         <td>{{ manufacturer.name }}</td>
                                         <td>
-                                          
+                                          <a href="{{ url_for('app.manufacturers', slug=manufacturer.slug) }}"
+                                              class="text-dark" target="_blank">
+                                              <i class="fas fa-eye"></i> View
+                                          </a>
                                         </td>
                                         <td>
                                             <a href="{{ url_for('admin.update_manufacturers', id=manufacturer.id) }}" class="text-dark">
