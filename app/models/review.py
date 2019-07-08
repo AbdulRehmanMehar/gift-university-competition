@@ -20,4 +20,4 @@ class Review(db.Model):
         self.reviewer_id = reviewer_id
 
     def __repr__(self):
-        return self.name
+        return f'{self.rating}'
