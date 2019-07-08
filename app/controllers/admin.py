@@ -13,8 +13,8 @@ admin = Blueprint('admin', __name__)
 def restrict():
     if not current_user.is_authenticated:
         return abort(403)
-    if not current_user.admin:
-        flash('It seems you\'re not admin.', 'danger')
+    if not current_user.admin or not current_user.business:
+        flash('It seems that you don\'t have privillages to access the resource.', 'danger')
         return abort(403)
 
 
@@ -113,7 +113,7 @@ def update_manufacturers(id):
     man = Manufactures.query.filter(Manufactures.id == id).first()
     if request.method == 'POST' and request.form.get('name').strip():
         man.name = request.form.get('name')
-        # man.slug = man.set_slug(man.name)
+        man.slug = man.set_slug(man.name)
         db.session.commit()
         return redirect(url_for('admin.view_manufacturers'))
     return render_template('admin/manufacturers/edit.html', man=man)
@@ -163,43 +163,47 @@ def add_product():
 @admin.route('/product/delete/<int:id>')
 def delete_product(id):
     prod = Product.query.filter(Product.id == id).first()
-    db.session.delete(prod)
-    db.session.commit()
+    if prod.owner.id == current_user.id or current_user.admin:
+        db.session.delete(prod)
+        db.session.commit()
     return redirect(url_for('admin.view_products'))
 
 
 @admin.route('/product/edit/<int:id>', methods=['GET', 'POST'])
 def update_product(id):
     prod = Product.query.get(id)
-    form = UpdateProductForm(request.form)
-    photo_form = PhotoUploadForm(request.files)
-    if request.method == 'GET':
-        form.set_default(prod)
-    if request.method == 'POST' and form.validate():
-        file = prod.photo
-        if photo_form.photo.data:
-            if not photo_form.validate():
-                return render_template('admin/product/edit.html', p_id=prod.id, form=form, photo_form=photo_form)
-            file = f'{form.title.data}.{photo_form.ext}'
-            photo = request.files[photo_form.photo.name]
-            os.remove(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', prod.photo))
-            photo.save(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', file))
-        cat = Category.query.filter(
-            Category.name == str(form.category.data)).first()
-        man = Manufactures.query.filter(
-            Manufactures.name == str(form.manufacturer.data)).first()
-        prod.title = form.title.data
-        prod.price = form.price.data
-        prod.category_id = cat.id
-        prod.manufacturer_id = man.id
-        prod.quantity = form.quantity.data
-        prod.featured = form.featured.data == 'True'
-        prod.photo = file
-        prod.description = form.description.data
-        db.session.commit()
+    if current_user.admin or prod.owner_id == current_user.id:
+        form = UpdateProductForm(request.form)
+        photo_form = PhotoUploadForm(request.files)
+        if request.method == 'GET':
+            form.set_default(prod)
+        if request.method == 'POST' and form.validate():
+            file = prod.photo
+            if photo_form.photo.data:
+                if not photo_form.validate():
+                    return render_template('admin/product/edit.html', p_id=prod.id, form=form, photo_form=photo_form)
+                file = f'{form.title.data}.{photo_form.ext}'
+                photo = request.files[photo_form.photo.name]
+                os.remove(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', prod.photo))
+                photo.save(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', file))
+            cat = Category.query.filter(
+                Category.name == str(form.category.data)).first()
+            man = Manufactures.query.filter(
+                Manufactures.name == str(form.manufacturer.data)).first()
+            prod.title = form.title.data
+            prod.price = form.price.data
+            prod.category_id = cat.id
+            prod.manufacturer_id = man.id
+            prod.quantity = form.quantity.data
+            prod.featured = form.featured.data == 'True'
+            prod.photo = file
+            prod.description = form.description.data
+            db.session.commit()
         return redirect(url_for('admin.view_products'))
 
-    return render_template('admin/product/edit.html', p_id=prod.id, form=form, photo_form=photo_form)
+        return render_template('admin/product/edit.html', p_id=prod.id, form=form, photo_form=photo_form)
+    return redirect(url_for('admin.view_products'))
+
 
 
 @admin.route('/product/view', defaults={'page': 1})
