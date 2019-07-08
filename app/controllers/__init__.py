@@ -2,7 +2,7 @@ import os, stripe, yaml
 from .. import app
 from ..utils import Pagination, Cart
 from flask_login import login_required, current_user
-from ..models import db, Category, Product, Order, Refund, User
+from ..models import db, Category, Product, Order, Refund, User, Review
 from flask import Blueprint, render_template, send_file, request, session, abort, flash, redirect, url_for
 
 index = Blueprint('app', __name__)
@@ -232,6 +232,47 @@ def product_photo(slug):
     prod = Product.query.filter(Product.slug == slug).first()
     file = os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', prod.photo)
     return send_file(file)
+
+
+@index.route('/leave-review', methods=['POST'])
+@login_required
+def leave_review():
+    pid = request.form.get('product_id')
+    rating = request.form.get('rating')
+    if pid != None and rating > 0 and rating <= 5:
+        review = Review(rating, pid, current_user.id)
+        db.session.add(review)
+        db.session.commit()
+    redir = request.args.get('next') or request.referrer or url_for('app.home')
+    return redirect(redir)
+
+
+@index.route('/update-review', methods=['POST'])
+@login_required
+def update_review():
+    rating = request.form.get('rating')
+    review_id = request.form.get('review_id')
+    review = Review.query.filter(Review.id == review_id).first()
+    if review and rating > 0 and rating <= 5:
+        review.rating = rating
+        db.session.commit()
+    redir = request.args.get('next') or request.referrer or url_for('app.home')
+    return redirect(redir)
+
+
+@index.route('/delete-review', methods=['POST'])
+@login_required
+def delete_review():
+    review = Review.query.filter(Review.id == request.form.get('review_id')).first()
+    db.session.delete(review)
+    db.session.commit()
+    redir = request.args.get('next') or request.referrer or url_for('app.home')
+    return redirect(redir)
+
+
+
+
+
 
 
 # IMPORT other controllers
