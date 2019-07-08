@@ -16,12 +16,13 @@ class User(UserMixin, db.Model):
     password = db.Column('password', db.String(200), nullable=False)
     photo = db.Column('photo', db.String(200), unique=True, nullable=True)
     admin = db.Column('admin', db.Boolean, nullable=False, default=False)
+    business = db.Column('business', db.Boolean, nullable=False, default=False)
     verified = db.Column('verified', db.Boolean, nullable=False, default=False)
     verificationToken = db.Column('verificationToken', db.String(300), nullable=True)
     created_on = db.Column('created_on', db.DateTime, default=datetime.utcnow)
     modified_on = db.Column('modified_on', db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, name, email, username, phone, address, password, admin=False, verified=False):
+    def __init__(self, name, email, username, phone, address, password, admin=False, verified=False, business=False):
         self.name = name
         self.email = email
         self.username = username
@@ -30,6 +31,7 @@ class User(UserMixin, db.Model):
         self.password = self.hash(password)
         self.admin = admin
         self.verified = verified
+        self.business = business
         user = User.query.order_by(User.id.desc()).first()
         if not user:
             self.id = 1

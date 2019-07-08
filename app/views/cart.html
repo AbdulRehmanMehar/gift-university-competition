@@ -81,8 +81,12 @@
                     </table>
                 </div>
             {% else %}
-                <h3>Your cart is empty!</h3>
-{#                <a href="{{ url_for('app.') }}">Add One?</a>#}
+                {% if current_user.is_authenticated %}
+                    <h1>View saved carts.</h1>
+                    <a href="{{ url_for('dashboard.cart') }}">View</a>
+                {% else %} 
+                  <h3>Your cart is empty!</h3>
+                {% endif%}
             {% endif %}
         </div>
     </div>
