@@ -310,9 +310,21 @@ def delete_review():
 
 
 
-@index.route('/manufacturer/<string:slug>')
-def manufacturers(slug):
-    return slug
+@index.route('/manufacturer/<string:slug>', defaults={'page': 1})
+@index.route('/category/<string:slug>/<int:page>')
+def manufacturers(slug, page):
+    man = Manufactures.query.filter(Manufactures.slug == slug).first()
+    paginator = Pagination(man.products, 9, page)
+    return render_template('products.html',
+                           category={
+                               'name': man.name
+                           },
+                           pages=paginator.pages,
+                           products=paginator.get_results(),
+                           items_per_page=paginator.get_items_per_page(),
+                           current_page_number=paginator.get_current_page_number()
+                           )
+
 
 
 

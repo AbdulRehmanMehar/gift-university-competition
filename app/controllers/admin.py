@@ -150,7 +150,8 @@ def add_product():
             Manufactures.name == str(form.manufacturer.data)).first()
         file = f'{form.title.data}.{photo_form.ext}'
         prod = Product(form.title.data, form.price.data, form.quantity.data,
-                       form.featured.data == 'True', form.description.data, file, current_user.id, cat.id, man)
+                       form.featured.data == 'True', form.description.data, file, current_user.id, cat.id, man.id)
+        prod.manufacturer_id = man.id
         photo = request.files[photo_form.photo.name]
         photo.save(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', file))
         db.session.add(prod)
@@ -163,46 +164,43 @@ def add_product():
 @admin.route('/product/delete/<int:id>')
 def delete_product(id):
     prod = Product.query.filter(Product.id == id).first()
-    if prod.owner.id == current_user.id or current_user.admin:
-        db.session.delete(prod)
-        db.session.commit()
+    db.session.delete(prod)
+    db.session.commit()
     return redirect(url_for('admin.view_products'))
 
 
 @admin.route('/product/edit/<int:id>', methods=['GET', 'POST'])
 def update_product(id):
     prod = Product.query.get(id)
-    if current_user.admin or prod.owner_id == current_user.id:
-        form = UpdateProductForm(request.form)
-        photo_form = PhotoUploadForm(request.files)
-        if request.method == 'GET':
-            form.set_default(prod)
-        if request.method == 'POST' and form.validate():
-            file = prod.photo
-            if photo_form.photo.data:
-                if not photo_form.validate():
-                    return render_template('admin/product/edit.html', p_id=prod.id, form=form, photo_form=photo_form)
-                file = f'{form.title.data}.{photo_form.ext}'
-                photo = request.files[photo_form.photo.name]
-                os.remove(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', prod.photo))
-                photo.save(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', file))
-            cat = Category.query.filter(
-                Category.name == str(form.category.data)).first()
-            man = Manufactures.query.filter(
-                Manufactures.name == str(form.manufacturer.data)).first()
-            prod.title = form.title.data
-            prod.price = form.price.data
-            prod.category_id = cat.id
-            prod.manufacturer_id = man.id
-            prod.quantity = form.quantity.data
-            prod.featured = form.featured.data == 'True'
-            prod.photo = file
-            prod.description = form.description.data
-            db.session.commit()
+    form = UpdateProductForm(request.form)
+    photo_form = PhotoUploadForm(request.files)
+    if request.method == 'GET':
+        form.set_default(prod)
+    if request.method == 'POST' and form.validate():
+        file = prod.photo
+        if photo_form.photo.data:
+            if not photo_form.validate():
+                return render_template('admin/product/edit.html', p_id=prod.id, form=form, photo_form=photo_form)
+            file = f'{form.title.data}.{photo_form.ext}'
+            photo = request.files[photo_form.photo.name]
+            os.remove(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', prod.photo))
+            photo.save(os.path.join(f'{app.config["UPLOADS_FOLDER"]}/products', file))
+        cat = Category.query.filter(
+            Category.name == str(form.category.data)).first()
+        man = Manufactures.query.filter(
+            Manufactures.name == str(form.manufacturer.data)).first()
+        prod.title = form.title.data
+        prod.price = form.price.data
+        prod.category_id = cat.id
+        prod.manufacturer_id = man.id
+        prod.quantity = form.quantity.data
+        prod.featured = form.featured.data == 'True'
+        prod.photo = file
+        prod.description = form.description.data
+        db.session.commit()
         return redirect(url_for('admin.view_products'))
 
-        return render_template('admin/product/edit.html', p_id=prod.id, form=form, photo_form=photo_form)
-    return redirect(url_for('admin.view_products'))
+    return render_template('admin/product/edit.html', p_id=prod.id, form=form, photo_form=photo_form)
 
 
 
